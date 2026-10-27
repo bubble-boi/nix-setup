@@ -12,14 +12,13 @@ in
   xdg.configFile = {
     "hypr".source = link "hypr";
     "alacritty".source = link "alacritty";
-    "fcitx5".source = link "fcitx5";
     "tmux".source = link "tmux";
   };
 
   home.file = {
     ".zshrc".source = link ".zshrc";
     ".zprofile".source = link ".zprofile";
-    ".local/bin/my-hypr-bin".source = link "my-hypr-bin";
+    ".local/bin/mybin".source = link "mybin";
   };
 
   home.packages = [
