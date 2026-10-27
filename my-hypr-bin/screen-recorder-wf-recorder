@@ -1,0 +1,41 @@
+#!/bin/bash
+
+PID_FILE="/tmp/wf-recorder.pid"
+VIDEO_DIR="$HOME/Documents/Videos"
+
+mkdir -p "$VIDEO_DIR"
+
+if [ -f "$PID_FILE" ]; then
+    PID=$(cat "$PID_FILE")
+    if kill "$PID" 2>/dev/null; then
+        rm "$PID_FILE"
+        notify-send "wf-recorder stopped"
+    else
+        echo "Process not found. Cleaning up."
+        rm "$PID_FILE"
+    fi
+else
+    FILE="$VIDEO_DIR/record_$(date +'%Y%m%d_%H%M%S').mp4"
+    TEMP_FILE="$VIDEO_DIR/temp_$(date +'%Y%m%d_%H%M%S').mp4"
+
+    # wf-recorder -g "1920x1080+0,0" -f "$TEMP_FILE" &
+    wf-recorder -f "$TEMP_FILE" &
+
+    echo $! > "$PID_FILE"
+    notify-send "wf-recorder started: $TEMP_FILE"
+
+    (
+        PID_WF=$(cat "$PID_FILE")
+        while kill -0 "$PID_WF" 2>/dev/null; do
+            sleep 1
+        done
+
+        if [ -f "$TEMP_FILE" ]; then
+            ffmpeg -i "$TEMP_FILE" -vf "transpose=2" -c:v libx264 -crf 0 -preset veryslow -c:a copy "$FILE"
+            rm "$TEMP_FILE"
+            notify-send "Recording rotated and saved: $FILE"
+        else
+            notify-send "wf-recorder failed or was cancelled"
+        fi
+    ) &
+fi

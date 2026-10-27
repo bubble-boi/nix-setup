@@ -1,0 +1,19 @@
+[window]
+opacity = 0
+padding = { x = 10, y = 10 }
+
+[font]
+size = 15.0
+normal = { family = "Noto Sans Mono CJK JP" }
+
+[selection]
+save_to_clipboard = true
+
+[cursor]
+style = { shape = "Beam", blinking = "On" }
+blink_interval = 500
+blink_timeout = 0
+unfocused_hollow = false
+
+[colors]
+cursor = { text = "#181818", cursor = "#d8d8d8" }

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+FILE="/tmp/ocr_area.png"
+grim -g "$(slurp)" "$FILE"
+tesseract "$FILE" - -l jpn | wl-copy
+
+aplay /usr/share/sounds/speech-dispatcher/gummy-cat-2.wav
+
