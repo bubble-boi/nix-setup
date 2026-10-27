@@ -78,8 +78,8 @@ fn main() {
         let (d_used, d_total) = disk_usage_gib("/");
 
         println!(
-            "{:>5.1}% #[default]#[fg=colour004]#[default]#[bg=colour004,fg=colour000] \
-             {:>4.1} GiB #[default]#[fg=colour004]#[default]#[bg=colour004,fg=colour000] \
+            "{:>5.1}%  \
+             {:>4.1} GiB  \
              {:>5.1} GiB / {:>5.1} GiB",
             cpu,
             mem_gib,

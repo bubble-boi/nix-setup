@@ -1,7 +1,7 @@
 for d in \
     "$HOME/bin" \
     "$HOME/.local/bin" \
-    "$HOME/.local/bin/my-hypr-bin" \
+    "$HOME/.local/bin/mybin" \
     "$HOME/.cargo/bin"
 do
     case ":$PATH:" in
@@ -19,10 +19,12 @@ autoload -Uz compinit promptinit
 compinit -C
 promptinit
 
-export EDITOR=nvim
-export VISUAL=nvim
+export EDITOR=nano
+export VISUAL=nano
 
-# https://wiki.archlinux.org/title/Zsh
+########################################
+# https://wiki.archlinux.org/title/Zsh #
+########################################
 
 # hist
 HISTFILE=~/.zsh_history
@@ -34,25 +36,7 @@ setopt hist_ignore_dups
 setopt hist_reduce_blanks
 
 # alias
-alias v='nvim'
-alias cat='bat --style=plain --paging=never'
 alias c='clear'
-alias ll='ls -lh'
-alias la='ls -la'
-alias l='ls -CF'
-alias g='git'
-alias gst='git status'
-alias ga='git add'
-alias gaa='git add --all'
-alias gc='git commit'
-alias gcm='git commit -m'
-alias gco='git checkout'
-alias gb='git branch'
-alias gl='git pull'
-alias gp='git push'
-alias gd='git diff'
-alias gds='git diff --staged'
-alias glog='git log --oneline --decorate --graph'
 
 # completion styles (must be before compinit)
 zstyle ':completion:*' menu select

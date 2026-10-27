@@ -1,6 +1,3 @@
-nvim/lazy/
-
-wallpapers/*
-!wallpapers/.put_your_wallpapers_here
-
 **/target/
+
+hardware-configuration.nix

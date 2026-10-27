@@ -4,7 +4,7 @@ padding = { x = 10, y = 10 }
 
 [font]
 size = 15.0
-normal = { family = "Noto Sans Mono CJK JP" }
+normal = { family = "M PLUS 1 Code" }
 
 [selection]
 save_to_clipboard = true

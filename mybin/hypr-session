@@ -17,6 +17,8 @@ done
 
 # EXEC
 fcitx5 -d &
+
+systemctl --user start nix-wallpaper.service || true
 hyprpaper &
 hypridle &
 
