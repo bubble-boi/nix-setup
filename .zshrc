@@ -37,7 +37,6 @@ setopt hist_reduce_blanks
 
 # alias
 alias c='clear'
-alias hypd='hyprctl dispatch'
 
 # completion styles (must be before compinit)
 zstyle ':completion:*' menu select
