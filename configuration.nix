@@ -1,3 +1,4 @@
+
 { pkgs, ... }: {
 
   imports = [
@@ -273,6 +274,32 @@
       '';
     })
   ];
+
+  # Relocate configuration and retain the standard NixOS path
+  system.activationScripts.moveNixosConfig = {
+    deps = [ "users" ];
+
+    text = ''
+      source=/etc/nixos
+      target=/home/qwe/nix-setup
+
+      if [ -d "$source/.git" ] && [ ! -e "$target" ]; then
+        mv -- "$source" "$target"
+        chown -R qwe:users -- "$target"
+      fi
+
+      if [ -d "$target/.git" ]; then
+        if [ -d "$source" ] && [ ! -L "$source" ] &&
+           [ -z "$(ls -A "$source")" ]; then
+          rmdir -- "$source"
+        fi
+
+        if [ ! -e "$source" ] && [ ! -L "$source" ]; then
+          ln -s -- "$target" "$source"
+        fi
+      fi
+    '';
+  };
 
   # Dotfiles: back up existing regular files/directories
   system.activationScripts.backupDotfiles = {
