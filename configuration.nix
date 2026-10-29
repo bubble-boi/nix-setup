@@ -45,7 +45,6 @@
   ];
 
   environment.systemPackages = with pkgs; [
-    brightnessctl
     hyprpaper
     hypridle
     alacritty

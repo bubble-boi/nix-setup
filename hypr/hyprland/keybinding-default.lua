@@ -1,3 +1,4 @@
+
 local mainMod = "SUPER"
 local terminal = "alacritty"
 local lock = "hyprlock"
@@ -29,6 +30,15 @@ end)
 
 hl.bind(mainMod .. " + U", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))
+
+-- MOUSE
+hl.bind(mainMod .. " + mouse:272",
+    hl.dsp.window.drag(),
+    { mouse = true })
+
+hl.bind(mainMod .. " + SHIFT + mouse:272",
+    hl.dsp.window.resize(),
+    { mouse = true })
 
 -- FOCUS
 local directions = {
