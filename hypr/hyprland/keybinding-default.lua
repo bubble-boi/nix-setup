@@ -9,7 +9,7 @@ hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("clip 3"))
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("browser"))
 hl.bind(mainMod .. " + SHIFT + P", hl.dsp.exec_cmd("grab color"))
 hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("grab area"))
-hl.bind(mainMod .. " + SHIFT + A + S", hl.dsp.exec_cmd("grab full"))
+hl.bind(mainMod .. " + SHIFT + A", hl.dsp.exec_cmd("grab full")
 hl.bind("code:66", hl.dsp.exec_cmd("fcitx5-remote -t"))
 
 -- BRIGHTNESS

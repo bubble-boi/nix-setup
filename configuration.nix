@@ -25,7 +25,21 @@ in
 
   system.stateVersion = "26.05";
 
-  programs.zsh.enable = true;
+  programs.zsh = {
+    enable = true;
+    syntaxHighlighting.enable = true;
+
+    loginShellInit = ''
+      if [[ "$(tty)" == "/dev/tty1" ]] && [[ -z "$WAYLAND_DISPLAY" ]]; then
+        exec start-hyprland
+      fi
+    '';
+
+    interactiveShellInit = ''
+      source ${pkgs.zsh-autopair}/share/zsh/zsh-autopair/autopair.zsh
+    '';
+  };
+
   programs.hyprland.enable = true;
   programs.hyprlock.enable = true;
 
@@ -95,8 +109,7 @@ in
         .config/hypr \
         .config/alacritty \
         .config/tmux \
-        .zshrc \
-        .zprofile
+        .zshrc
       do
         dst="${homeDir}/$rel"
 
@@ -116,6 +129,5 @@ in
     "L+ ${homeDir}/.config/alacritty - ${username} users - ${./alacritty}"
     "L+ ${homeDir}/.config/tmux - ${username} users - ${./tmux}"
     "L+ ${homeDir}/.zshrc - ${username} users - ${./.zshrc}"
-    "L+ ${homeDir}/.zprofile - ${username} users - ${./.zprofile}"
   ];
 }
