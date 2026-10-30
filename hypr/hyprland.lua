@@ -1,7 +1,5 @@
 -- PLUGIN
-hl.plugin.load(
-    os.getenv("HYPRLIQUID_DIR") .. "/lib/libhyprliquid.so"
-)
+hl.plugin.load("/etc/hypr/plugins/hyprglass.so")
 require("hyprland.plugin")
 
 -- DISPLAY

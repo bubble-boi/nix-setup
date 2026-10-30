@@ -1,9 +1,17 @@
-hl.window_rule({
-    name = "alacritty-liquid",
-    match = { class = "Alacritty" },
+if hl.plugin.hyprglass then
+    local hg = hl.plugin.hyprglass
 
-    ["hyprliquid:effect"] = "liquid_glass",
-    ["hyprliquid:corner_radius"] = 10,
-    ["hyprliquid:highlight_style"] = 3,
-    ["hyprliquid:glass_dispersion"] = true,
-})
+    hg.config({
+        enabled = false,
+        default_theme = "dark",
+        default_preset = "pomme",
+        manage_window_blur = true,
+        skip_opaque_windows = true,
+    })
+
+    hl.window_rule({
+        name = "alacritty-glass",
+        match = { class = "Alacritty" },
+        tag = "+hyprglass_enabled",
+    })
+end

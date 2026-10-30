@@ -1,25 +1,55 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 
 let
   flakeDir = "/home/qwe/nix-setup";
-  flakeRef = "path:${flakeDir}";
+  flakeRef = "path:${flakeDir}#nixos";
 
-  updateFlake = pkgs.writeShellScript "update-flake" ''
+  upgradeScript = pkgs.writeShellScript "upgrade-nixos" ''
     set -euo pipefail
+
+    cd "${flakeDir}"
+
+    exec 9>/run/lock/nixos-flake-update.lock
+    ${pkgs.util-linux}/bin/flock -n 9
+
+    backup=$(${pkgs.coreutils}/bin/mktemp)
+    ${pkgs.coreutils}/bin/cp -p flake.lock "$backup"
+
+    cleanup() {
+      status=$?
+
+      if [ "$status" -ne 0 ]; then
+        echo "Update failed. Restoring flake.lock"
+        ${pkgs.coreutils}/bin/cp -p "$backup" flake.lock
+      fi
+
+      ${pkgs.coreutils}/bin/rm -f "$backup"
+    }
+
+    trap cleanup EXIT
+
+    echo "Updating all flake inputs"
 
     ${pkgs.util-linux}/bin/runuser -u qwe -- \
-      ${pkgs.nix}/bin/nix \
-        --extra-experimental-features "nix-command flakes" \
-        flake update nixpkgs \
-        --flake "${flakeRef}"
-  '';
+      ${pkgs.nix}/bin/nix flake update \
+        --flake "path:${flakeDir}"
 
-  pruneGenerations = pkgs.writeShellScript "prune-nixos-generations" ''
-    set -euo pipefail
+    echo "Building NixOS"
+
+    ${pkgs.nix}/bin/nix build \
+      "path:${flakeDir}#nixosConfigurations.nixos.config.system.build.toplevel" \
+      --no-link
+
+    echo "Switching NixOS"
+
+    ${config.system.build.nixos-rebuild}/bin/nixos-rebuild \
+      switch --flake "${flakeRef}"
+
+    echo "Pruning old generations"
 
     ${pkgs.nix}/bin/nix-env \
       --profile /nix/var/nix/profiles/system \
-      --delete-generations +3
+      --delete-generations +3 || true
   '';
 in
 {
@@ -28,18 +58,29 @@ in
     "flakes"
   ];
 
-  system.autoUpgrade = {
-    enable = true;
-    flake = "${flakeRef}#nixos";
-    upgrade = false;
-    dates = "03:00";
-    randomizedDelaySec = "0";
-    allowReboot = false;
+  system.autoUpgrade.enable = false;
+
+  systemd.services.nixos-upgrade = {
+    description = "Update all NixOS flake inputs";
+
+    restartIfChanged = false;
+    stopIfChanged = false;
+
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = upgradeScript;
+      TimeoutStartSec = "infinity";
+    };
   };
 
-  systemd.services.nixos-upgrade.serviceConfig = {
-    ExecStartPre = updateFlake;
-    ExecStartPost = pruneGenerations;
+  systemd.timers.nixos-upgrade = {
+    wantedBy = [ "timers.target" ];
+
+    timerConfig = {
+      OnCalendar = "*-*-* 03:00:00";
+      Persistent = true;
+      RandomizedDelaySec = "0";
+    };
   };
 
   boot.loader.systemd-boot.configurationLimit = 3;
