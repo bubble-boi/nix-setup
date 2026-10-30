@@ -25,6 +25,9 @@ in
 
   system.stateVersion = "26.05";
 
+  time.timeZone = "Asia/Tokyo";
+  environment.sessionVariables.TZDIR = "/etc/zoneinfo";
+
   programs.zsh = {
     enable = true;
     syntaxHighlighting.enable = true;

@@ -40,8 +40,14 @@ zstyle ':completion:*' menu select
 zstyle ':completion::complete:*' gain-privileges 1
 
 # prompt theme (zsh builtin prompt themes)
-prompt="%B>%b "
-PS2="%F{243}│%f "
+PROMPT='%n@%m:%~$ '
+
+setopt PROMPT_SUBST
+ps2_align() {
+  local p=${(%)PROMPT}
+  printf '%*s' "$(( ${#p} - 2 ))" ''
+}
+PS2='$(ps2_align)%F{243}│%f '
 
 # make terminfo available
 zmodload zsh/terminfo 2>/dev/null || true
