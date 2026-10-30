@@ -38,6 +38,10 @@ in
     interactiveShellInit = ''
       source ${pkgs.zsh-autopair}/share/zsh/zsh-autopair/autopair.zsh
     '';
+
+    shellAliases = {
+      rebuild = "sudo nixos-rebuild switch --flake path:/home/qwe/nix-setup#nixos";
+    };
   };
 
   programs.hyprland.enable = true;

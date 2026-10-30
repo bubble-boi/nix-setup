@@ -1,3 +1,9 @@
+-- PLUGIN
+hl.plugin.load(
+    os.getenv("HYPRLIQUID_DIR") .. "/lib/libhyprliquid.so"
+)
+require("hyprland.plugin")
+
 -- DISPLAY
 require("hyprland.monitors-default")
 

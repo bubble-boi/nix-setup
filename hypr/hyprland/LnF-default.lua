@@ -5,7 +5,7 @@ hl.env("XCURSOR_SIZE", "24")
 -- GENERAL
 hl.config({
     general = {
-        border_size = 1,
+        border_size = 0,
         gaps_in = {
             top = 0,
             right = 0,
@@ -18,10 +18,6 @@ hl.config({
             bottom = 10,
             left = 10,
         },
-        col = {
-            inactive_border = "rgba(FFFFFF80)",
-            active_border = "rgba(FFFFFF80)",
-        },
         layout = "dwindle",
         resize_on_border = true,
         snap = {
@@ -30,10 +26,10 @@ hl.config({
     },
 
     decoration = {
-        rounding = 5,
-        rounding_power = 2,
+        rounding = 0,
+        rounding_power = 0,
         blur = {
-            enabled = true,
+            enabled = false,
             size = 5,
             passes = 5,
             noise = 0.03,
