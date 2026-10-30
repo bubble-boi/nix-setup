@@ -1,4 +1,3 @@
-
 local mainMod = "SUPER"
 local terminal = "alacritty"
 local lock = "hyprlock"
@@ -24,7 +23,15 @@ hl.bind(mainMod .. " + C", hl.dsp.window.close())
 
 hl.bind(mainMod .. " + W", function()
     hl.dispatch(hl.dsp.window.float({ action = "toggle" }))
-    hl.dispatch(hl.dsp.window.resize({ x = 1280, y = 720 }))
+
+    local monitor = hl.get_active_monitor()
+    if monitor then
+        hl.dispatch(hl.dsp.window.resize({
+            x = math.floor(monitor.width * 0.3),
+            y = math.floor(monitor.height * 0.3)
+        }))
+    end
+
     hl.dispatch(hl.dsp.window.center())
 end)
 
@@ -56,5 +63,10 @@ end
 -- WORKSPACES
 for i = 1, 10 do
     local key = i % 10
-    hl.bind(mainMod .. " + " .. key, hl.dsp.focus({ workspace = i }))
+
+    hl.bind(mainMod .. " + " .. key,
+        hl.dsp.focus({ workspace = i }))
+
+    hl.bind(mainMod .. " + SHIFT + " .. key,
+        hl.dsp.window.move({ workspace = i }))
 end

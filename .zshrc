@@ -1,8 +1,5 @@
 for d in \
-    "$HOME/bin" \
-    "$HOME/.local/bin" \
-    "$HOME/.local/bin/mybin" \
-    "$HOME/.cargo/bin"
+    "$HOME/.local/bin"
 do
     case ":$PATH:" in
         *":$d:"*) ;;

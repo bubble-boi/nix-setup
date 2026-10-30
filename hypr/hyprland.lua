@@ -18,3 +18,16 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("clip 1")
     hl.exec_cmd("clip 2")
 end)
+
+-- CLIPBOARD WINDOW
+hl.window_rule({
+    match = {
+        initial_title = "^Clipboard$",
+    },
+    float = true,
+    size = {
+        "(monitor_w*0.3)",
+        "(monitor_h*0.2)",
+    },
+    center = true,
+})

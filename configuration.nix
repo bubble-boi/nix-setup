@@ -46,7 +46,6 @@
 
   environment.systemPackages = with pkgs; [
     hyprpaper
-    hypridle
     alacritty
     git
     tmux
@@ -150,19 +149,17 @@
             ;;
 
           _select)
-            selected=$(cliphist list -fields id,mime,preview | fzf \
+            selected=$(cliphist list | fzf \
               --delimiter=$'\t' \
-              --with-nth=3..) || exit 0
+              --with-nth=2.. \
+              --no-scrollbar \
+              --no-info \
+              --no-separator \
+              --no-mouse) || exit 0
+
             [[ -n "$selected" ]] || exit 0
 
-            id=$(printf '%s\n' "$selected" | cut -f 1)
-            mime=$(printf '%s\n' "$selected" | cut -f 2)
-
-            if [[ "$mime" == */* ]]; then
-              printf '%s\n' "$id" | cliphist decode | wl-copy --type "$mime"
-            else
-              printf '%s\n' "$id" | cliphist decode | wl-copy
-            fi
+            printf '%s\n' "$selected" | cliphist decode | wl-copy
             printf '1\n' > "$2"
             ;;
 
