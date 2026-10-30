@@ -2,11 +2,15 @@ if hl.plugin.hyprglass then
     local hg = hl.plugin.hyprglass
 
     hg.config({
-        -- GENERAL
         enabled = false,
         default_theme = "dark",
         default_preset = "pomme",
-        },
+    })
+
+    hg.preset("pomme", {
+        refraction_spread = 1.0,
+        refraction_strength = 8.0,
+        lens_distortion = 2.0,
     })
 
     hl.window_rule({

@@ -75,7 +75,7 @@ in
   ];
 
   environment.systemPackages = with pkgs; [
-    hyprpaper
+    mpvpaper
     alacritty
     git
     tmux
