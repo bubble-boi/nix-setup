@@ -3,7 +3,7 @@ hl.config({
         kb_model = "jp106",
         kb_layout = "jp",
         kb_variant = "",
-        kb_options = "ctrl:nocaps",
+        kb_options = "caps:menu",
         kb_rules = "",
 
         sensitivity = 0.8,
