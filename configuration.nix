@@ -1,9 +1,6 @@
+
 { pkgs, ... }:
 
-let
-  username = "qwe";
-  homeDir = "/home/${username}";
-in
 {
   imports = [
     ./hardware-configuration.nix
@@ -12,9 +9,10 @@ in
     ./modules/wl-copy.nix
     ./modules/update.nix
     ./modules/browser.nix
+    ./modules/dotfiles.nix
   ];
 
-  users.users.${username} = {
+  users.users.qwe = {
     isNormalUser = true;
     extraGroups = [ "wheel" ];
     shell = pkgs.zsh;
@@ -26,7 +24,6 @@ in
   system.stateVersion = "26.05";
 
   time.timeZone = "Asia/Tokyo";
-  environment.sessionVariables.TZDIR = "/etc/zoneinfo";
 
   programs.zsh = {
     enable = true;
@@ -82,61 +79,5 @@ in
     tmux
     mpvpaper
     bibata-cursors
-  ];
-
-  # Relocate configuration and retain the standard NixOS path
-  system.activationScripts.moveNixosConfig = {
-    deps = [ "users" ];
-
-    text = ''
-      source=/etc/nixos
-      target="${homeDir}/nix-setup"
-
-      if [ -d "$source/.git" ] && [ ! -e "$target" ]; then
-        mv -- "$source" "$target"
-        chown -R ${username}:users -- "$target"
-      fi
-
-      if [ -d "$target/.git" ]; then
-        if [ -d "$source" ] && [ ! -L "$source" ] &&
-           [ -z "$(ls -A "$source")" ]; then
-          rmdir -- "$source"
-        fi
-
-        if [ ! -e "$source" ] && [ ! -L "$source" ]; then
-          ln -s -- "$target" "$source"
-        fi
-      fi
-    '';
-  };
-
-  # Dotfiles: back up existing regular files/directories
-  system.activationScripts.backupDotfiles = {
-    deps = [ "users" ];
-    text = ''
-      for rel in \
-        .config/hypr \
-        .config/alacritty \
-        .config/tmux \
-        .zshrc
-      do
-        dst="${homeDir}/$rel"
-
-        if [ -e "$dst" ] && [ ! -L "$dst" ]; then
-          ${pkgs.coreutils}/bin/mv -- "$dst" \
-            "$dst.bak.$(${pkgs.coreutils}/bin/date +%s%N)"
-        fi
-      done
-    '';
-  };
-
-  # Dotfiles: link Nix store files to user home
-  systemd.tmpfiles.rules = [
-    "d ${homeDir}/.config 0755 ${username} users - -"
-
-    "L+ ${homeDir}/.config/hypr - ${username} users - ${./hypr}"
-    "L+ ${homeDir}/.config/alacritty - ${username} users - ${./alacritty}"
-    "L+ ${homeDir}/.config/tmux - ${username} users - ${./tmux}"
-    "L+ ${homeDir}/.zshrc - ${username} users - ${./.zshrc}"
   ];
 }
