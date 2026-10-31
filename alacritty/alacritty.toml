@@ -11,8 +11,6 @@ save_to_clipboard = true
 
 [cursor]
 style = { shape = "Beam", blinking = "On" }
-blink_interval = 500
-blink_timeout = 0
 unfocused_hollow = false
 
 [colors]
