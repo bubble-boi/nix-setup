@@ -1,5 +1,4 @@
-
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 
 {
   environment.systemPackages = [
@@ -7,7 +6,7 @@
       name = "ide";
 
       runtimeInputs = [
-        pkgs.hyprland
+        config.programs.hyprland.package
         pkgs.coreutils
       ];
 
@@ -23,9 +22,10 @@
         cmd="''${cmd//\\/\\\\}"
         cmd="''${cmd//\"/\\\"}"
 
-        exec hyprctl dispatch \
+        exec hyprctl -i 0 dispatch \
           "hl.dsp.exec_cmd(\"$cmd\")"
       '';
     })
   ];
 }
+

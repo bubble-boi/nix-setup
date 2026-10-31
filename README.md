@@ -38,6 +38,28 @@ test -d /sys/firmware/efi/efivars || {
 lsblk -o NAME,SIZE,TYPE,MODEL,MOUNTPOINTS
 ```
 
+### Network
+
+Check the network connection:
+
+```bash
+nmcli device status
+```
+
+If using Wi-Fi:
+
+```bash
+nmcli radio wifi on
+nmcli device wifi list
+nmcli --ask device wifi connect "SSID"
+```
+
+Verify connectivity:
+
+```bash
+ping -c 3 nixos.org
+```
+
 ### Partition
 
 Set `DISK` to the installation target. All existing partitions on the selected disk will be destroyed.
@@ -92,6 +114,18 @@ git clone \
 nixos-generate-config --root /mnt
 ```
 
+Ensure `configuration.nix` contains:
+
+```nix
+networking.networkmanager.enable = true;
+```
+
+And that `qwe` belongs to the `networkmanager` group:
+
+```nix
+extraGroups = [ "wheel" "networkmanager" ];
+```
+
 ### Install
 
 ```bash
@@ -137,6 +171,39 @@ sudo nixos-rebuild switch \
 
 Automatic updates are scheduled daily at 03:00, followed by garbage collection at 04:00.
 
+## Network
+
+### Status
+
+```bash
+nmcli general status
+nmcli device status
+nmcli connection show --active
+```
+
+### Wi-Fi
+
+```bash
+nmcli radio wifi on
+nmcli device wifi list
+nmcli --ask device wifi connect "SSID"
+```
+
+### Connections
+
+```bash
+nmcli connection show
+nmcli connection up "NAME"
+nmcli connection down "NAME"
+```
+
+### Network Interface
+
+```bash
+ip address
+ip route
+```
+
 ## Commands
 
 | Command | Description |
@@ -177,17 +244,17 @@ Screenshots are saved to `~/.Screenshots/` and copied to the clipboard.
 | `Brightness Up` | Increase brightness |
 | `Brightness Down` | Decrease brightness |
 | `Super + C` | Close the active window |
-| `Super + W` | Toggle floating, resize and center the window |
+| `Super + W` | Toggle floating, resize and center |
 | `Super + U` | Toggle pseudotiling |
 | `Super + J` | Toggle split orientation |
-| `Super + Arrow` | Move focus in the specified direction |
-| `Super + Shift + Arrow` | Move the active window in the specified direction |
+| `Super + Arrow` | Move focus |
+| `Super + Shift + Arrow` | Move the active window |
 | `Super + 1–9` | Switch to workspace 1–9 |
 | `Super + 0` | Switch to workspace 10 |
-| `Super + Shift + 1–9` | Move the active window to workspace 1–9 |
-| `Super + Shift + 0` | Move the active window to workspace 10 |
-| `Super + Left Mouse Drag` | Move a window |
-| `Super + Shift + Left Mouse Drag` | Resize a window |
+| `Super + Shift + 1–9` | Move window to workspace 1–9 |
+| `Super + Shift + 0` | Move window to workspace 10 |
+| `Super + Left Mouse Drag` | Move window |
+| `Super + Shift + Left Mouse Drag` | Resize window |
 
 ### tmux
 
@@ -195,18 +262,17 @@ Default prefix: `Ctrl + B`
 
 | Shortcut | Action |
 |---|---|
-| `Alt + N` | Split horizontally (side by side) |
-| `Alt + Shift + N` | Split vertically (top and bottom) |
+| `Alt + N` | Split horizontally |
+| `Alt + Shift + N` | Split vertically |
 | `Ctrl + B`, then `A` | Toggle synchronized pane input |
 
 ### Zsh
 
 | Shortcut | Action |
 |---|---|
-| `Up / Down` | Search command history by the current prefix |
+| `Up / Down` | Search command history by prefix |
 | `Ctrl + Left / Right` | Move backward or forward by word |
 | `Home / End` | Move to the beginning or end of the line |
-| `Shift + Tab` | Select the previous completion candidate |
-| `Page Up / Page Down` | Move through the editing buffer or history |
+| `Shift + Tab` | Select previous completion |
+| `Page Up / Page Down` | Navigate editing buffer or history |
 | `Insert` | Toggle overwrite mode |
-
