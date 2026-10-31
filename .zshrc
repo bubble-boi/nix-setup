@@ -1,4 +1,3 @@
-
 # PATH
 for d in \
     "$HOME/.local/bin"
