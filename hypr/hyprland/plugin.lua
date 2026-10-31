@@ -8,9 +8,10 @@ if hl.plugin.hyprglass then
     })
 
     hg.preset("pomme", {
-        refraction_spread = 1.0,
         refraction_strength = 8.0,
         lens_distortion = 2.0,
+        blur_strength = 1.0,
+        blur_iterations = 0,
     })
 
     hl.window_rule({

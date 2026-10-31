@@ -1,6 +1,6 @@
 -- CURSOR
 hl.env("XCURSOR_THEME", "Bibata-Modern-Classic")
-hl.env("XCURSOR_SIZE", "24")
+hl.env("XCURSOR_SIZE", "16")
 
 -- GENERAL
 hl.config({
@@ -29,9 +29,6 @@ hl.config({
         rounding = 0,
         blur = {
             enabled = false,
-            size = 5,
-            passes = 5,
-            noise = 0.03,
         },
         shadow = {
             enabled = false,

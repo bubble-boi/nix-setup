@@ -8,8 +8,8 @@ hl.bind(mainMod .. " + SHIFT + Return",
         hl.dsp.exec_cmd(terminal, {
             float = true,
             size = {
-                "(monitor_w*0.4)",
-                        "(monitor_h*0.4)",
+                "(monitor_w*0.5)",
+                        "(monitor_h*0.5)",
             },
             center = true,
         }))
