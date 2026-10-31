@@ -21,6 +21,9 @@ hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("grab area"))
 hl.bind(mainMod .. " + SHIFT + A", hl.dsp.exec_cmd("grab full"))
 hl.bind("code:66", hl.dsp.exec_cmd("fcitx5-remote -t"))
 
+-- LOGOUT
+hl.bind(mainMod .. " + M", hl.dsp.exit())
+
 -- BRIGHTNESS
 local brightness = "sh /home/qwe/.config/hypr/hyprland/brightness-logind.sh"
 
