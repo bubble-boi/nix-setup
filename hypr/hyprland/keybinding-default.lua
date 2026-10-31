@@ -4,6 +4,15 @@ local lock = "hyprlock"
 
 -- APPLICATIONS
 hl.bind(mainMod .. " + Return", hl.dsp.exec_cmd(terminal))
+hl.bind(mainMod .. " + SHIFT + Return",
+        hl.dsp.exec_cmd(terminal, {
+            float = true,
+            size = {
+                "(monitor_w*0.4)",
+                        "(monitor_h*0.4)",
+            },
+            center = true,
+        }))
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd(lock))
 hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("clip 3"))
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("browser"))
