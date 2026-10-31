@@ -9,6 +9,7 @@
     ./modules/wl-copy.nix
     ./modules/update.nix
     ./modules/browser.nix
+    ./modules/ide.nix
     ./modules/dotfiles.nix
   ];
 
