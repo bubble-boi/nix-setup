@@ -75,10 +75,12 @@ in
   ];
 
   environment.systemPackages = with pkgs; [
-    mpvpaper
     alacritty
+    kdePackages.kate
+    kdePackages.konsole
     git
     tmux
+    mpvpaper
     bibata-cursors
   ];
 
