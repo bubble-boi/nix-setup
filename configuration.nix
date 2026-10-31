@@ -21,6 +21,13 @@
 
   networking.networkmanager.enable = true;
 
+  hardware.graphics = {
+  enable = true;
+  extraPackages = with pkgs; [
+    intel-media-driver
+  ];
+};
+
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 

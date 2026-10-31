@@ -17,7 +17,7 @@ require("hyprland.keybinding-default")
 -- AUTOSTART
 hl.on("hyprland.start", function()
     hl.exec_cmd("fcitx5 -d")
-    hl.exec_cmd('mpvpaper -o "no-audio loop-file=inf panscan=1.0" ALL ~/.current_wallpaper')
+    hl.exec_cmd('mpvpaper -o "no-audio loop-file=inf panscan=1.0 hwdec=auto" ALL ~/.current_wallpaper')
     hl.exec_cmd("clip 1")
     hl.exec_cmd("clip 2")
 end)
