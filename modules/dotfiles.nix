@@ -20,6 +20,10 @@ in
     deps = [ "users" ];
 
     text = ''
+      ${pkgs.util-linux}/bin/runuser -u ${username} -- \
+        ${pkgs.bash}/bin/bash <<'DOTFILES'
+      set -euo pipefail
+
       configDir="${homeDir}/.config"
 
       if [ ! -d "${homeDir}" ]; then
@@ -27,15 +31,18 @@ in
         exit 1
       fi
 
-      if [ ! -e "$configDir" ] && [ ! -L "$configDir" ]; then
-        ${pkgs.coreutils}/bin/install -d \
-          -m 0755 -o ${username} -g users \
-          "$configDir"
+      if [ -L "$configDir" ]; then
+        echo "Symlink not allowed: $configDir" >&2
+        exit 1
+      fi
+
+      if [ -e "$configDir" ] && [ ! -d "$configDir" ]; then
+        echo "Not a directory: $configDir" >&2
+        exit 1
       fi
 
       if [ ! -d "$configDir" ]; then
-        echo "Not a directory: $configDir" >&2
-        exit 1
+        ${pkgs.coreutils}/bin/mkdir -m 0755 -- "$configDir"
       fi
 
       ${lib.concatStringsSep "\n" (
@@ -66,6 +73,7 @@ in
           fi
         '') dotfiles
       )}
+      DOTFILES
     '';
   };
 }

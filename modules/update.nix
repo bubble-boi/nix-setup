@@ -1,3 +1,4 @@
+
 { config, pkgs, ... }:
 
 let
@@ -13,17 +14,19 @@ let
     ${pkgs.util-linux}/bin/flock -n 9
 
     backup=$(${pkgs.coreutils}/bin/mktemp)
-    ${pkgs.coreutils}/bin/cp -p flake.lock "$backup"
+    ${pkgs.coreutils}/bin/cp -p -- flake.lock "$backup"
 
     cleanup() {
       status=$?
+      trap - EXIT
 
       if [ "$status" -ne 0 ]; then
-        echo "Update failed. Restoring flake.lock"
-        ${pkgs.coreutils}/bin/cp -p "$backup" flake.lock
+        echo "Update failed. Restoring flake.lock" >&2
+        ${pkgs.coreutils}/bin/cp -p -- "$backup" flake.lock
       fi
 
-      ${pkgs.coreutils}/bin/rm -f "$backup"
+      ${pkgs.coreutils}/bin/rm -f -- "$backup"
+      exit "$status"
     }
 
     trap cleanup EXIT
@@ -49,7 +52,7 @@ let
 
     ${pkgs.nix}/bin/nix-env \
       --profile /nix/var/nix/profiles/system \
-      --delete-generations +3 || true
+      --delete-generations +10 || true
   '';
 in
 {
@@ -62,6 +65,9 @@ in
 
   systemd.services.nixos-upgrade = {
     description = "Update all NixOS flake inputs";
+
+    wants = [ "network-online.target" ];
+    after = [ "network-online.target" ];
 
     restartIfChanged = false;
     stopIfChanged = false;
@@ -83,7 +89,7 @@ in
     };
   };
 
-  boot.loader.systemd-boot.configurationLimit = 3;
+  boot.loader.systemd-boot.configurationLimit = 5;
 
   nix.gc = {
     automatic = true;
