@@ -21,7 +21,7 @@ ShellRoot {
         busy = true;
         if (!pam.start()) {
             busy = false;
-            status = "PAMを開始できない";
+            status = "Failed to initialize PAM";
         }
     }
 
@@ -45,15 +45,15 @@ ShellRoot {
                 Qt.quit();
             } else if (root.status === "") {
                 root.status = result === PamResult.Failed
-                    ? "パスワードが違う"
-                    : "認証エラー";
+                    ? "Authentication failed"
+                    : "Authentication error";
             }
         }
 
         onError: error => {
             root.busy = false;
             root.password = "";
-            root.status = "PAMエラー";
+            root.status = "PAM error";
         }
     }
 
