@@ -1,4 +1,5 @@
 import QtQuick
+import QtCore
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Services.Pam
@@ -69,7 +70,7 @@ ShellRoot {
                 // The desktop uses the same ~/.current_wallpaper via hyprpaper.
                 Image {
                     anchors.fill: parent
-                    source: "file://" + Quickshell.env("HOME") + "/.current_wallpaper"
+                    source: StandardPaths.writableLocation(StandardPaths.HomeLocation) + "/.current_wallpaper"
                     fillMode: Image.PreserveAspectCrop
                     asynchronous: true
                 }
