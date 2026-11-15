@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import QtCore
 import Quickshell
 import Quickshell.Wayland
@@ -73,6 +74,15 @@ ShellRoot {
                     source: StandardPaths.writableLocation(StandardPaths.HomeLocation) + "/.current_wallpaper"
                     fillMode: Image.PreserveAspectCrop
                     asynchronous: true
+
+                    // Blur only the wallpaper, not the clock, player, or input.
+                    layer.enabled: true
+                    layer.effect: MultiEffect {
+                        autoPaddingEnabled: false
+                        blurEnabled: true
+                        blurMax: 32
+                        blur: 1.0
+                    }
                 }
 
                 Clock {
