@@ -79,6 +79,8 @@
   programs.hyprland.enable = true;
   programs.hyprlock.enable = true;
 
+  security.pam.services.quickshell = {};
+
   security.rtkit.enable = true;
 
   services.pipewire = {

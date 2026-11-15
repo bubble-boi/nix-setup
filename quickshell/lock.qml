@@ -28,8 +28,8 @@ ShellRoot {
 
     PamContext {
         id: pam
-        // NixOS: programs.hyprlock.enable = true provides /etc/pam.d/hyprlock.
-        config: "hyprlock"
+        // Dedicated NixOS PAM service: /etc/pam.d/quickshell.
+        config: "quickshell"
 
         onPamMessage: {
             if (pam.responseRequired)
