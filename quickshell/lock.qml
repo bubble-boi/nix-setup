@@ -110,6 +110,19 @@ ShellRoot {
                     verticalAlignment: TextInput.AlignVCenter
                     echoMode: TextInput.Password
                     inputMethodHints: Qt.ImhSensitiveData | Qt.ImhNoPredictiveText
+
+                    layer.enabled: true
+                    layer.effect: MultiEffect {
+                        blurEnabled: true
+                        blurMax: 8
+                        blur: 0.2
+
+                        shadowEnabled: true
+                        shadowColor: "#ff000000"
+                        shadowBlur: 0.5
+                        shadowHorizontalOffset: 0
+                        shadowVerticalOffset: 3
+                    }
                     enabled: !root.busy
                     focus: true
                     onTextChanged: root.password = text
