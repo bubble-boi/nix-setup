@@ -1,0 +1,22 @@
+[general]
+mode = gallery
+
+[viewer]
+scale = fill
+
+[gallery]
+size = 300
+pstore = yes
+
+[list]
+order = mtime
+recursive = yes
+all = yes
+
+[info]
+show = no
+
+[keys.gallery]
+Return = exec ~/.config/swayimg/set-wallpaper.sh "%"
+MouseLeft = exec ~/.config/swayimg/set-wallpaper.sh "%"
+Shift+Delete = exec rm -f '%'

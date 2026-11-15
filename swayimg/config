@@ -1,0 +1,28 @@
+[general]
+mode = gallery
+
+[viewer]
+scale = fill
+
+[gallery]
+size = 200
+window = #181818
+
+[list]
+order = mtime
+
+
+
+[info]
+show = yes
+
+[info.gallery]
+top_left = name,format,filesize,imagesize,exif
+top_right = none
+bottom_left = scale,frame
+bottom_right = status
+
+[keys.gallery]
+Return = exec google-chrome-stable "%"
+MouseLeft = exec google-chrome-stable "%"
+Shift+Delete = exec rm -f '%'

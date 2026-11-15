@@ -1,0 +1,17 @@
+[window]
+opacity = 0
+padding = { x = 10, y = 10 }
+
+[font]
+size = 10.0
+normal = { family = "ProFont IIx Nerd Font Mono" }
+
+[selection]
+save_to_clipboard = true
+
+[cursor]
+style = { shape = "Beam" }
+unfocused_hollow = false
+
+[colors]
+cursor = { text = "#181818", cursor = "#d8d8d8" }
