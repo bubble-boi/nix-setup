@@ -1,0 +1,103 @@
+{ config, lib, pkgs, ... }:
+
+let
+  normalUserNames = builtins.attrNames (
+    lib.filterAttrs (_: user: user.isNormalUser) config.users.users
+  );
+
+  username =
+    if builtins.length normalUserNames == 1 then
+      builtins.head normalUserNames
+    else
+      throw "update.nix: expected exactly one normal user";
+
+  flakeDir = "${config.users.users.${username}.home}/nix-setup";
+  flakeRef = "path:${flakeDir}#nixos";
+
+  upgradeScript = pkgs.writeShellScript "upgrade-nixos" ''
+    set -euo pipefail
+
+    cd "${flakeDir}"
+
+    exec 9>/run/lock/nixos-flake-update.lock
+    ${pkgs.util-linux}/bin/flock -n 9
+
+    backup=$(${pkgs.coreutils}/bin/mktemp)
+    ${pkgs.coreutils}/bin/cp -p -- flake.lock "$backup"
+
+    cleanup() {
+      status=$?
+      trap - EXIT
+
+      if [ "$status" -ne 0 ]; then
+        echo "Update failed. Restoring flake.lock" >&2
+        ${pkgs.coreutils}/bin/cp -p -- "$backup" flake.lock
+      fi
+
+      ${pkgs.coreutils}/bin/rm -f -- "$backup"
+      exit "$status"
+    }
+
+    trap cleanup EXIT
+
+    echo "Updating all flake inputs"
+
+    ${pkgs.util-linux}/bin/runuser -u ${lib.escapeShellArg username} -- \
+      ${pkgs.nix}/bin/nix flake update \
+        --flake "path:${flakeDir}"
+
+    echo "Building NixOS"
+
+    ${pkgs.nix}/bin/nix build \
+      "path:${flakeDir}#nixosConfigurations.nixos.config.system.build.toplevel" \
+      --no-link
+
+    echo "Switching NixOS"
+
+    ${config.system.build.nixos-rebuild}/bin/nixos-rebuild \
+      switch --flake "${flakeRef}"
+
+  '';
+in
+{
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
+
+  system.autoUpgrade.enable = false;
+
+  systemd.services.nixos-upgrade = {
+    description = "Update all NixOS flake inputs";
+
+    wants = [ "network-online.target" ];
+    after = [ "network-online.target" ];
+
+    restartIfChanged = false;
+    stopIfChanged = false;
+
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = upgradeScript;
+      TimeoutStartSec = "infinity";
+    };
+  };
+
+  systemd.timers.nixos-upgrade = {
+    wantedBy = [ "timers.target" ];
+
+    timerConfig = {
+      OnCalendar = "*-*-* 03:00:00";
+      Persistent = true;
+      RandomizedDelaySec = "0";
+    };
+  };
+
+  boot.loader.systemd-boot.configurationLimit = 5;
+
+  nix.gc = {
+    automatic = true;
+    dates = "04:00";
+    options = "--delete-older-than 14d";
+  };
+}
