@@ -101,7 +101,7 @@ ShellRoot {
                     width: parent.width
                     height: 46
                     radius: 6
-                    color: Style.galleryTileColor
+                    color: "transparent"
 
                     TextInput {
                         id: searchInput
