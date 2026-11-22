@@ -287,8 +287,9 @@ ShellRoot {
                         required property int index
                         required property var modelData
 
-                        width: Math.round(gallery.height * 1.6)
+                        width: Math.round(gallery.height * 1.6 * 0.82)
                         height: gallery.height
+                        z: root.selectedIndex === index ? 1 : 0
 
                         // Cache names include path and modification time.
                         // Visible delegates check for a saved PNG before decoding originals.
@@ -331,20 +332,19 @@ ShellRoot {
                                 loadOriginal()
                         }
 
-                        Rectangle {
-                            id: imageFrame
-                            anchors.fill: parent
-                            radius: 6
-                            color: "transparent"
-                            border.color: Style.textColor
-                            border.width: root.selectedIndex === index ? 3 : 0
-                            clip: true
-                        }
-
                         Image {
                             id: preview
-                            anchors.fill: imageFrame
-                            anchors.margins: root.selectedIndex === index ? 3 : 0
+                            anchors.centerIn: parent
+                            width: Math.round(thumbnail.height * 1.6 * 0.72)
+                            height: Math.round(thumbnail.height * 0.72)
+                            scale: root.selectedIndex === index ? 1.18 : 1.0
+
+                            Behavior on scale {
+                                NumberAnimation {
+                                    duration: 200
+                                    easing.type: Easing.OutCubic
+                                }
+                            }
                             source: thumbnail.previewPath.length > 0
                             ? root.fileUrl(thumbnail.previewPath) : ""
                             sourceSize: Qt.size(400, 240)
