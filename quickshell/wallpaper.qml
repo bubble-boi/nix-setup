@@ -246,7 +246,7 @@ ShellRoot {
         Rectangle {
             id: content
             anchors.fill: parent
-            color: "#01000000" // alpha mask for Hyprglass, visually transparent
+            color: "#33000000" // translucent alpha mask for Hyprglass
             focus: true
 
             Keys.onPressed: event => {
