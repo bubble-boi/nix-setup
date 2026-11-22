@@ -61,7 +61,7 @@ ShellRoot {
     }
 
     PanelWindow {
-        WlrLayershell.namespace: "quickshell:launcher"
+        WlrLayershell.namespace: "HyprGlass"
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
 
@@ -81,7 +81,7 @@ ShellRoot {
             width: Math.min(parent.width - 48, 640)
             height: Math.min(parent.height - 48, 490)
             radius: 12
-            color: Style.galleryBackgroundColor
+            color: "#01000000" // alpha mask for Hyprglass, visually transparent
             border.color: Style.galleryBorderColor
             border.width: 1
 
