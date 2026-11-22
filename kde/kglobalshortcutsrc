@@ -1,0 +1,71 @@
+[kwin]
+Window Close=Meta+C,Alt+F4,Close Window
+Switch to Desktop 1=Meta+1,none,Switch to Desktop 1
+Window to Desktop 1=Meta+Shift+1,none,Window to Desktop 1
+Switch to Desktop 2=Meta+2,none,Switch to Desktop 2
+Window to Desktop 2=Meta+Shift+2,none,Window to Desktop 2
+Switch to Desktop 3=Meta+3,none,Switch to Desktop 3
+Window to Desktop 3=Meta+Shift+3,none,Window to Desktop 3
+Switch to Desktop 4=Meta+4,none,Switch to Desktop 4
+Window to Desktop 4=Meta+Shift+4,none,Window to Desktop 4
+Switch to Desktop 5=Meta+5,none,Switch to Desktop 5
+Window to Desktop 5=Meta+Shift+5,none,Window to Desktop 5
+Switch to Desktop 6=Meta+6,none,Switch to Desktop 6
+Window to Desktop 6=Meta+Shift+6,none,Window to Desktop 6
+Switch to Desktop 7=Meta+7,none,Switch to Desktop 7
+Window to Desktop 7=Meta+Shift+7,none,Window to Desktop 7
+Switch to Desktop 8=Meta+8,none,Switch to Desktop 8
+Window to Desktop 8=Meta+Shift+8,none,Window to Desktop 8
+Switch to Desktop 9=Meta+9,none,Switch to Desktop 9
+Window to Desktop 9=Meta+Shift+9,none,Window to Desktop 9
+Switch to Desktop 10=Meta+0,none,Switch to Desktop 10
+Window to Desktop 10=Meta+Shift+0,none,Window to Desktop 10
+
+[services][net.qwe.work-terminal.desktop]
+_launch=Meta+Shift+Return,none,work-terminal
+
+[services][net.qwe.terminal.desktop]
+_launch=Meta+Return,none,terminal
+
+[services][net.qwe.clipboard.desktop]
+_launch=Meta+V,none,clipboard
+
+[services][net.qwe.launcher.desktop]
+_launch=Meta+R,none,launcher
+
+[services][net.qwe.wallpaper.desktop]
+_launch=Meta+P,none,wallpaper
+
+[services][net.qwe.lock.desktop]
+_launch=Meta+L,none,lock
+
+[services][net.qwe.pick-color.desktop]
+_launch=Meta+Shift+D,none,pick-color
+
+[services][net.qwe.grab-area.desktop]
+_launch=Meta+Shift+S,none,grab-area
+
+[services][net.qwe.grab-full.desktop]
+_launch=Meta+Shift+A,none,grab-full
+
+[services][net.qwe.ime-toggle.desktop]
+_launch=F13,none,ime-toggle
+
+[services][net.qwe.logout.desktop]
+_launch=Meta+M,none,logout
+
+[services][net.qwe.brightness-up.desktop]
+_launch=XF86MonBrightnessUp,none,brightness-up
+
+[services][net.qwe.brightness-down.desktop]
+_launch=XF86MonBrightnessDown,none,brightness-down
+
+[services][net.qwe.volume-up.desktop]
+_launch=XF86AudioRaiseVolume,none,volume-up
+
+[services][net.qwe.volume-down.desktop]
+_launch=XF86AudioLowerVolume,none,volume-down
+
+[services][net.qwe.volume-mute.desktop]
+_launch=XF86AudioMute,none,volume-mute
+
