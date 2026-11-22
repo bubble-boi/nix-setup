@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Toggle IME
+Exec=fcitx5-remote -t
+Terminal=false
+StartupNotify=false
+X-KDE-GlobalAccel-CommandShortcut=true
