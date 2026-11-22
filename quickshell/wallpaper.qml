@@ -228,7 +228,7 @@ ShellRoot {
     PanelWindow {
         id: galleryWindow
 
-        WlrLayershell.namespace: "HyprGlass"
+        WlrLayershell.namespace: "quickshell:wallpaper"
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
 
@@ -243,10 +243,9 @@ ShellRoot {
         exclusionMode: ExclusionMode.Ignore
         focusable: true
 
-        Rectangle {
+        Item {
             id: content
             anchors.fill: parent
-            color: "#33000000" // translucent alpha mask for Hyprglass
             focus: true
 
             Keys.onPressed: event => {
@@ -281,42 +280,10 @@ ShellRoot {
                 anchors.margins: 14
                 spacing: 8
 
-                Row {
-                    id: heading
-                    width: parent.width
-                    height: 24
-                    spacing: 16
-
-                    Text {
-                        text: "WALLPAPERS"
-                        font.family: Style.fontFamily
-                        font.pixelSize: 17
-                        font.bold: true
-                        color: Style.textColor
-                    }
-
-                    Text {
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: root.wallpapers.length + " images"
-                        font.family: Style.monoFontFamily
-                        font.pixelSize: 12
-                        color: Style.galleryMutedColor
-                    }
-
-                    Text {
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: root.statusMessage
-                        font.family: Style.monoFontFamily
-                        font.pixelSize: 12
-                        color: Style.textColor
-                        visible: root.statusMessage.length > 0
-                    }
-                }
-
                 ListView {
                     id: gallery
                     width: parent.width
-                    height: Math.max(48, parent.height - heading.height - parent.spacing)
+                    height: parent.height
                     clip: true
                     orientation: ListView.Horizontal
                     spacing: 12
@@ -378,22 +345,21 @@ ShellRoot {
                                 loadOriginal()
                         }
 
-                        // Keep the image inside its own frame, with the filename
-                        // fully outside the frame beneath it.
-                        Item {
+                        Rectangle {
                             id: imageFrame
-                            anchors.top: parent.top
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            anchors.bottom: filenameLabel.top
-                            anchors.bottomMargin: 8
+                            anchors.fill: parent
+                            radius: 6
+                            color: "transparent"
+                            border.color: root.confirmDelete && root.selectedIndex === index
+                                ? Style.errorColor : Style.textColor
+                            border.width: root.selectedIndex === index ? 3 : 0
                             clip: true
                         }
 
                         Image {
                             id: preview
                             anchors.fill: imageFrame
-                            opacity: root.selectedIndex === index ? 1 : 0.7
+                            anchors.margins: root.selectedIndex === index ? 3 : 0
                             source: thumbnail.previewPath.length > 0
                             ? root.fileUrl(thumbnail.previewPath) : ""
                             sourceSize: Qt.size(400, 240)
@@ -429,32 +395,6 @@ ShellRoot {
                             }
                         }
 
-                        Text {
-                            anchors.centerIn: preview
-                            visible: thumbnail.previewPath.length === 0 || thumbnail.previewFailed
-                            text: thumbnail.previewFailed
-                            ? "Preview unavailable" : "Loading preview..."
-                            color: Style.galleryMutedColor
-                            font.family: Style.monoFontFamily
-                            font.pixelSize: 12
-                        }
-
-                        Text {
-                            id: filenameLabel
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            anchors.bottom: parent.bottom
-                            anchors.leftMargin: 8
-                            anchors.rightMargin: 8
-                            height: 26
-                            verticalAlignment: Text.AlignVCenter
-                            elide: Text.ElideMiddle
-                            text: root.fileName(thumbnail.modelData.path)
-                            font.family: Style.monoFontFamily
-                            font.pixelSize: 12
-                            color: Style.textColor
-                        }
-
                         MouseArea {
                             anchors.fill: parent
                             enabled: !root.busy && !root.confirmDelete
@@ -465,54 +405,11 @@ ShellRoot {
                         }
                     }
 
-                    Text {
-                        anchors.centerIn: parent
-                        visible: root.wallpapers.length === 0
-                        text: "No wallpapers found in " + root.wallpaperDir
-                        font.family: Style.monoFontFamily
-                        font.pixelSize: 13
-                        color: Style.galleryMutedColor
-                    }
+
                 }
 
             }
 
-            Rectangle {
-                anchors.centerIn: parent
-                width: Math.min(parent.width - 40, 620)
-                height: 96
-                radius: 8
-                color: Style.galleryTileColor
-                visible: root.confirmDelete
-                z: 10
-
-                Column {
-                    anchors.centerIn: parent
-                    spacing: 10
-
-                    Text {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: "Delete " + (root.selectedIndex >= 0
-                        ? root.fileName(root.wallpapers[root.selectedIndex].path)
-                        : "") + "?"
-                        font.family: Style.monoFontFamily
-                        font.pixelSize: 16
-                        font.bold: true
-                        color: Style.textColor
-                        elide: Text.ElideMiddle
-                        width: Math.min(560, content.width - 60)
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-
-                    Text {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: "ENTER  CONFIRM     ESC  CANCEL"
-                        font.family: Style.monoFontFamily
-                        font.pixelSize: 13
-                        color: Style.galleryMutedColor
-                    }
-                }
-            }
         }
     }
 }
