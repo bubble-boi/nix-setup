@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Exit KWin
+Exec=pkill -TERM -u qwe -x kwin_wayland
+Terminal=false
+StartupNotify=false
+X-KDE-GlobalAccel-CommandShortcut=true
