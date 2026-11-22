@@ -65,22 +65,19 @@ ShellRoot {
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
 
-        anchors {
-            top: true
-            bottom: true
-            left: true
-            right: true
-        }
+        // A centered layer surface matching the glass panel itself.
+        // Keeping the surface screen-sized causes HyprGlass to use
+        // screen edges instead of the visible panel's edges.
+        implicitWidth: screen ? Math.min(screen.width - 48, 720) : 720
+        implicitHeight: screen ? Math.min(screen.height - 48, 440) : 440
 
         color: "transparent"
         exclusionMode: ExclusionMode.Ignore
         focusable: true
 
         Rectangle {
-            anchors.centerIn: parent
-            width: Math.min(parent.width - 48, 720)
-            height: Math.min(parent.height - 48, 440)
-            color: "#33000000" // translucent alpha mask for Hyprglass
+            anchors.fill: parent
+            color: "#33000000" // translucent panel; glass is rendered behind it
 
             Column {
                 anchors.fill: parent
