@@ -1,0 +1,8 @@
+[MouseBindings]
+CommandAllKey=Meta
+CommandAll1=Move
+CommandAll3=Resize
+
+[Desktops]
+Number=10
+Rows=1
