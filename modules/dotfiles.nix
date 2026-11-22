@@ -10,6 +10,7 @@ let
     ".config/kglobalshortcutsrc" = ../kde/kglobalshortcutsrc;
     ".config/tmux" = ../tmux;
     ".config/quickshell" = ../quickshell;
+    ".zprofile" = ../.zprofile;
     ".zshrc" = builtins.path {
       path = ../.zshrc;
       name = "zshrc";
