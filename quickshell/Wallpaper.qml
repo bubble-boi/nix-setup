@@ -37,7 +37,9 @@ Item {
     clip: true
 
     Image {
-        anchors.fill: parent
+        x: 0
+        width: parent.width
+        height: parent.height
         y: -root.height * root.progress
         source: root.imageUrl(root.currentPath)
         fillMode: Image.PreserveAspectCrop
@@ -47,7 +49,9 @@ Item {
 
     Image {
         id: nextImage
-        anchors.fill: parent
+        x: 0
+        width: parent.width
+        height: parent.height
         y: root.height * (1 - root.progress)
         source: root.imageUrl(root.nextPath)
         fillMode: Image.PreserveAspectCrop
