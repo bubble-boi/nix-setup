@@ -288,7 +288,7 @@ ShellRoot {
                     // Move the image strip under a stationary center selection.
                     highlightRangeMode: ListView.StrictlyEnforceRange
                     preferredHighlightBegin: sideMargin
-                    preferredHighlightEnd: sideMargin + tileWidth
+                    preferredHighlightEnd: sideMargin + 1
                     highlightMoveDuration: 220
                     highlightMoveVelocity: -1
 
