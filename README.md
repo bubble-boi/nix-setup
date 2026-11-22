@@ -81,6 +81,10 @@ rebuild
 # Automatic updates run daily at 03:00 via system.autoUpgrade
 ```
 
+## Desktop
+
+KDE Plasma 6 on Wayland, launched through SDDM. Hyprland and its tty1 auto-start are disabled.
+
 ## Shortcuts
 
 | Key | Action |
