@@ -1,27 +1,59 @@
-
 import QtQuick
 import QtQuick.Effects
 import Quickshell
+import Quickshell.Io
 import Quickshell.Wayland
 
 Scope {
-    PanelWindow {
-        WlrLayershell.namespace: "quickshell:clock"
-        WlrLayershell.layer: WlrLayer.Bottom
+    id: root
 
-        anchors {
-            top: true
-            bottom: true
-            left: true
-            right: true
+    property string wallpaperPath: ""
+
+    Process {
+        command: ["readlink", "-f", Quickshell.env("HOME") + "/.current_wallpaper"]
+        running: true
+        stdout: StdioCollector {
+            onStreamFinished: root.wallpaperPath = this.text.trim()
         }
+    }
 
-        color: "transparent"
-        exclusionMode: ExclusionMode.Ignore
-        mask: Region {}
+    IpcHandler {
+        target: "wallpaper"
 
-        Clock {
-            anchors.fill: parent
+        function set(path: string): void {
+            root.wallpaperPath = path
+        }
+    }
+
+    Variants {
+        model: Quickshell.screens
+
+        PanelWindow {
+            required property var modelData
+            screen: modelData
+
+            WlrLayershell.namespace: "quickshell:clock"
+            WlrLayershell.layer: WlrLayer.Bottom
+
+            anchors {
+                top: true
+                bottom: true
+                left: true
+                right: true
+            }
+
+            color: "black"
+            exclusionMode: ExclusionMode.Ignore
+            mask: Region {}
+
+            Wallpaper {
+                anchors.fill: parent
+                sourcePath: root.wallpaperPath
+            }
+
+            Clock {
+                anchors.fill: parent
+            }
         }
     }
 
