@@ -141,8 +141,7 @@ ShellRoot {
                 if (index < 0 && entries.length > 0)
                     index = Math.min(Math.max(oldIndex, 0), entries.length - 1)
                     root.selectedIndex = index
-                    gallery.displacement = 0
-                    gallery.queuedSteps = 0
+                    Qt.callLater(function() { gallery.reset() })
             }
         }
 
@@ -280,8 +279,43 @@ ShellRoot {
                     2, width / (2 * (baseWidth * 0.9 + imageGap)))
                 readonly property int sideCount: Math.ceil(scaleRadius) + 3
 
-                property real displacement: 0
+                // Keep an absolute scroll position. Visible delegates never
+                // change their image while the selection advances.
+                property real position: 0
+                property int baseIndex: 0
                 property int queuedSteps: 0
+                readonly property int poolCount: sideCount * 2 + 1
+
+                onSideCountChanged: Qt.callLater(function() { gallery.reset() })
+
+                function reset() {
+                    slide.stop()
+                    position = 0
+                    baseIndex = Math.max(0, root.selectedIndex)
+                    queuedSteps = 0
+                    for (let i = 0; i < thumbnailRepeater.count; ++i) {
+                        const item = thumbnailRepeater.itemAt(i)
+                        if (item)
+                            item.virtualSlot = i - sideCount
+                    }
+                }
+
+                // Only recycle tiles that have completely left the viewport.
+                // The center and its visible neighbors retain their Image
+                // sources, eliminating the flash on each arrow-key press.
+                function recycle() {
+                    for (let i = 0; i < thumbnailRepeater.count; ++i) {
+                        const item = thumbnailRepeater.itemAt(i)
+                        if (!item)
+                            continue
+
+                        const distance = item.virtualSlot - position
+                        if (distance < -sideCount)
+                            item.virtualSlot += poolCount
+                        else if (distance > sideCount)
+                            item.virtualSlot -= poolCount
+                    }
+                }
 
                 function scaleAt(distance) {
                     return 1.3 - 0.8 * Math.min(1, Math.abs(distance) / scaleRadius)
@@ -308,24 +342,24 @@ ShellRoot {
                         queuedSteps += direction
                         return
                     }
-                    slide.from = 0
-                    slide.to = direction
+                    slide.from = position
+                    slide.to = position + direction
                     slide.start()
                 }
 
                 NumberAnimation {
                     id: slide
                     target: gallery
-                    property: "displacement"
+                    property: "position"
                     from: 0
                     to: 1
                     duration: 220
                     easing.type: Easing.InOutCubic
                     onFinished: {
-                        const direction = gallery.displacement < 0 ? -1 : 1
                         root.selectedIndex = root.wrapIndex(
-                            root.selectedIndex + direction, root.wallpapers.length)
-                        gallery.displacement = 0
+                            gallery.baseIndex + Math.round(gallery.position),
+                            root.wallpapers.length)
+                        gallery.recycle()
 
                         if (gallery.queuedSteps !== 0) {
                             const next = gallery.queuedSteps < 0 ? -1 : 1
@@ -336,16 +370,18 @@ ShellRoot {
                 }
 
                 Repeater {
+                    id: thumbnailRepeater
                     model: root.wallpapers.length > 0
-                        ? gallery.sideCount * 2 + 1 : 0
+                        ? gallery.poolCount : 0
                     delegate: Item {
                         id: thumbnail
                         required property int index
-                        readonly property int slot: index - gallery.sideCount
+                        property int virtualSlot: index - gallery.sideCount
                         readonly property int originalIndex: root.wrapIndex(
-                            root.selectedIndex + slot, root.wallpapers.length)
-                        readonly property var modelData: root.wallpapers[originalIndex]
-                        readonly property real relativePosition: slot - gallery.displacement
+                            gallery.baseIndex + virtualSlot, root.wallpapers.length)
+                        readonly property var modelData: originalIndex >= 0
+                            ? root.wallpapers[originalIndex] : null
+                        readonly property real relativePosition: virtualSlot - gallery.position
 
                         width: gallery.baseWidth
                         height: gallery.height
@@ -355,8 +391,10 @@ ShellRoot {
 
                         // Cache names include path and modification time.
                         // Visible delegates check for a saved PNG before decoding originals.
-                        readonly property string cachePath: root.cacheDir + "/"
-                        + Qt.md5("crop-v3|" + modelData.path + "|" + modelData.mtime) + ".png"
+                        readonly property string cachePath: modelData
+                            ? root.cacheDir + "/"
+                                + Qt.md5("crop-v3|" + modelData.path + "|" + modelData.mtime) + ".png"
+                            : ""
                         property string previewPath: ""
                         property bool needsSaving: false
                         property bool saving: false
@@ -373,6 +411,8 @@ ShellRoot {
                         }
 
                         function loadOriginal() {
+                            if (!modelData)
+                                return
                             previewPath = modelData.path
                             needsSaving = root.cacheReady
                         }
@@ -380,7 +420,8 @@ ShellRoot {
                         Process {
                             id: cacheCheck
                             command: ["test", "-s", thumbnail.cachePath]
-                            running: root.cacheReady && thumbnail.previewPath.length === 0
+                            running: root.cacheReady && thumbnail.cachePath.length > 0
+                                && thumbnail.previewPath.length === 0
 
                             onExited: (exitCode, exitStatus) => {
                                 if (exitCode === 0) {
