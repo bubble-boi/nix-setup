@@ -35,26 +35,6 @@ ShellRoot {
     property bool busy: false
     property string statusMessage: ""
     property string applyingWallpaper: ""
-    property string monitorOutput: ""
-    property var remainingMonitors: []
-
-    function applyNextMonitor() {
-        if (remainingMonitors.length === 0) {
-            // Only persist the wallpaper after all monitors have been updated.
-            persistWallpaper.exec([
-                "ln", "-sfn", "--",
-                applyingWallpaper, homeDir + "/.current_wallpaper"
-            ])
-            return
-        }
-
-        const monitor = remainingMonitors.shift()
-        applyMonitor.exec([
-            "hyprctl", "hyprpaper", "wallpaper",
-            monitor + ", " + applyingWallpaper + ", cover"
-        ])
-    }
-
     function fileName(path) {
         return path.substring(path.lastIndexOf("/") + 1)
     }
@@ -76,8 +56,10 @@ ShellRoot {
             busy = true
             statusMessage = "Applying wallpaper..."
             applyingWallpaper = wallpapers[selectedIndex].path
-            monitorOutput = ""
-            listMonitors.exec(["hyprctl", "-i", "0", "monitors"])
+            persistWallpaper.exec([
+                "ln", "-sfn", "--",
+                applyingWallpaper, homeDir + "/.current_wallpaper"
+            ])
     }
 
     function deleteSelected() {
@@ -162,57 +144,27 @@ ShellRoot {
     }
 
     Process {
-        id: listMonitors
-
-        stdout: StdioCollector {
-            onStreamFinished: root.monitorOutput = this.text
-        }
-
-        onExited: (exitCode, exitStatus) => {
-            if (exitCode !== 0) {
-                root.busy = false
-                root.statusMessage = "Failed to list monitors."
-                return
-            }
-
-            const monitors = []
-            for (const line of root.monitorOutput.split("\n")) {
-                const match = /^Monitor (\S+)/.exec(line)
-                if (match)
-                    monitors.push(match[1])
-            }
-
-            if (monitors.length === 0) {
-                root.busy = false
-                root.statusMessage = "No monitors found."
-                return
-            }
-
-            root.remainingMonitors = monitors
-            root.applyNextMonitor()
-        }
-    }
-
-    Process {
-        id: applyMonitor
-
-        onExited: (exitCode, exitStatus) => {
-            if (exitCode !== 0) {
-                root.busy = false
-                root.statusMessage = "Failed to apply wallpaper to a monitor."
-            } else {
-                root.applyNextMonitor()
-            }
-        }
-    }
-
-    Process {
         id: persistWallpaper
+
+        onExited: (exitCode, exitStatus) => {
+            if (exitCode !== 0) {
+                root.busy = false
+                root.statusMessage = "Failed to save wallpaper selection."
+                return
+            }
+            notifyWallpaper.exec([
+                "qs", "ipc", "call", "wallpaper", "set", root.applyingWallpaper
+            ])
+        }
+    }
+
+    Process {
+        id: notifyWallpaper
 
         onExited: (exitCode, exitStatus) => {
             root.busy = false
             root.statusMessage = exitCode === 0
-            ? "" : "Wallpaper applied, but failed to save selection."
+                ? "" : "Wallpaper saved, but Quickshell IPC update failed."
         }
     }
 
