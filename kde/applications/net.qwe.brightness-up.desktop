@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Brightness Up
+Exec=sh /home/qwe/.config/hypr/hyprland/brightness-logind.sh up
+Terminal=false
+StartupNotify=false
+X-KDE-GlobalAccel-CommandShortcut=true
