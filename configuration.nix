@@ -67,7 +67,7 @@
     '';
 
     shellAliases = {
-      rebuild = "sudo nixos-rebuild switch --no-flake --file /home/qwe/nix-setup/configuration.nix";
+      rebuild = "sudo nixos-rebuild switch -I nixos-config=/home/qwe/nix-setup/configuration.nix";
     };
   };
 
