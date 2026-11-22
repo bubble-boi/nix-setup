@@ -18,26 +18,10 @@ ShellRoot {
     property var wallpapers: []
     property int selectedIndex: -1
 
-    // Repeat short galleries so both sides remain populated. PathView itself
-    // wraps around when reaching the last model item.
-    readonly property var carouselEntries: {
-        const count = wallpapers.length
-        if (count === 0)
-            return []
-
-        const minCount = gallery.pathItemCount + 2
-        const length = Math.max(count, Math.ceil(minCount / count) * count)
-        const entries = []
-        for (let i = 0; i < length; ++i) {
-            const wallpaper = wallpapers[i % count]
-            entries.push({
-                path: wallpaper.path,
-                mtime: wallpaper.mtime,
-                originalIndex: i % count
-            })
-        }
-        return entries
+    function wrapIndex(index, count) {
+        return count > 0 ? ((index % count) + count) % count : -1
     }
+
     property bool busy: false
     property string statusMessage: ""
     property string applyingWallpaper: ""
@@ -72,16 +56,7 @@ ShellRoot {
     }
 
     function moveSelection(step) {
-        if (busy || wallpapers.length < 2 || gallery.count === 0)
-            return
-
-        // Move exactly one visual tile, even when crossing the last/first image.
-        if (step < 0)
-            gallery.decrementCurrentIndex()
-        else
-            gallery.incrementCurrentIndex()
-
-        selectedIndex = gallery.currentIndex % wallpapers.length
+        gallery.advance(step)
     }
 
     function applySelected() {
@@ -166,11 +141,8 @@ ShellRoot {
                 if (index < 0 && entries.length > 0)
                     index = Math.min(Math.max(oldIndex, 0), entries.length - 1)
                     root.selectedIndex = index
-                    // Restore the selection after PathView's model has changed.
-                    Qt.callLater(function() {
-                        if (gallery.count > 0 && root.selectedIndex >= 0)
-                            gallery.currentIndex = root.selectedIndex
-                    })
+                    gallery.displacement = 0
+                    gallery.queuedSteps = 0
             }
         }
 
@@ -294,67 +266,92 @@ ShellRoot {
                 }
             }
 
-            Column {
+            Item {
+                id: gallery
                 anchors.fill: parent
-                // Use the full layer width; no side padding or inner clipping.
-                anchors.margins: 0
-                spacing: 0
+                clip: false
 
-                PathView {
-                    id: gallery
-                    width: parent.width
-                    height: parent.height
-                    clip: false
-                    model: root.carouselEntries
-                    interactive: false
+                // The rendered image widths, not imaginary fixed-width tiles,
+                // determine how far apart adjacent image centers must be.
+                readonly property real baseWidth: Math.round(height * 1.6 * 0.72)
+                readonly property real baseHeight: Math.round(height * 0.72)
+                readonly property real imageGap: 12
+                readonly property real scaleRadius: Math.max(
+                    2, width / (2 * (baseWidth * 0.9 + imageGap)))
+                readonly property int sideCount: Math.ceil(scaleRadius) + 3
 
-                    readonly property real tileWidth: Math.round(height * 1.6 * 0.82)
-                    readonly property real tileStep: tileWidth + 12
+                property real displacement: 0
+                property int queuedSteps: 0
 
-                    // Odd number of equally spaced tiles, with the selected tile
-                    // always at the center of the horizontal path.
-                    pathItemCount: Math.max(3,
-                        2 * Math.ceil(width / (2 * tileStep)) + 3)
-                    preferredHighlightBegin: 0.5
-                    preferredHighlightEnd: 0.5
-                    highlightRangeMode: PathView.StrictlyEnforceRange
-                    highlightMoveDuration: 220
+                function scaleAt(distance) {
+                    return 1.3 - 0.8 * Math.min(1, Math.abs(distance) / scaleRadius)
+                }
 
-                    // Smoothly scale each image from 0.5 at the far sides
-                    // to 1.3 at the selected position in the center.
-                    path: Path {
-                        startX: gallery.width / 2
-                            - gallery.pathItemCount * gallery.tileStep / 2
-                        startY: gallery.height / 2
-                        PathAttribute { name: "tileScale"; value: 0.5 }
-                        PathAttribute { name: "tileDepth"; value: 0 }
+                // Integrate the varying image widths from the center.
+                // This gives mirrored positions and a consistent visible gap.
+                function offsetFor(distance) {
+                    const absolute = Math.abs(distance)
+                    const inside = Math.min(absolute, scaleRadius)
+                    const beyond = Math.max(0, absolute - scaleRadius)
+                    const x = baseWidth * (1.3 * inside
+                        - 0.4 * inside * inside / scaleRadius)
+                        + imageGap * inside
+                        + (baseWidth * 0.5 + imageGap) * beyond
+                    return distance < 0 ? -x : x
+                }
 
-                        PathLine {
-                            x: gallery.width / 2
-                            y: gallery.height / 2
-                        }
-                        PathPercent { value: 0.5 }
-                        PathAttribute { name: "tileScale"; value: 1.3 }
-                        PathAttribute { name: "tileDepth"; value: 10 }
-
-                        PathLine {
-                            x: gallery.width / 2
-                                + gallery.pathItemCount * gallery.tileStep / 2
-                            y: gallery.height / 2
-                        }
-                        PathPercent { value: 1.0 }
-                        PathAttribute { name: "tileScale"; value: 0.5 }
-                        PathAttribute { name: "tileDepth"; value: 0 }
+                function advance(step) {
+                    if (root.busy || root.wallpapers.length < 2)
+                        return
+                    const direction = step < 0 ? -1 : 1
+                    if (slide.running) {
+                        queuedSteps += direction
+                        return
                     }
+                    slide.from = 0
+                    slide.to = direction
+                    slide.start()
+                }
 
+                NumberAnimation {
+                    id: slide
+                    target: gallery
+                    property: "displacement"
+                    from: 0
+                    to: 1
+                    duration: 220
+                    easing.type: Easing.InOutCubic
+                    onFinished: {
+                        const direction = gallery.displacement < 0 ? -1 : 1
+                        root.selectedIndex = root.wrapIndex(
+                            root.selectedIndex + direction, root.wallpapers.length)
+                        gallery.displacement = 0
+
+                        if (gallery.queuedSteps !== 0) {
+                            const next = gallery.queuedSteps < 0 ? -1 : 1
+                            gallery.queuedSteps -= next
+                            Qt.callLater(function() { gallery.advance(next) })
+                        }
+                    }
+                }
+
+                Repeater {
+                    model: root.wallpapers.length > 0
+                        ? gallery.sideCount * 2 + 1 : 0
                     delegate: Item {
                         id: thumbnail
                         required property int index
-                        required property var modelData
+                        readonly property int slot: index - gallery.sideCount
+                        readonly property int originalIndex: root.wrapIndex(
+                            root.selectedIndex + slot, root.wallpapers.length)
+                        readonly property var modelData: root.wallpapers[originalIndex]
+                        readonly property real relativePosition: slot - gallery.displacement
 
-                        width: gallery.tileWidth
+                        width: gallery.baseWidth
                         height: gallery.height
-                        z: PathView.tileDepth
+                        x: gallery.width / 2 + gallery.offsetFor(relativePosition) - width / 2
+                        y: 0
+                        z: 100 - Math.abs(relativePosition)
 
                         // Cache names include path and modification time.
                         // Visible delegates check for a saved PNG before decoding originals.
@@ -364,6 +361,16 @@ ShellRoot {
                         property bool needsSaving: false
                         property bool saving: false
                         property bool previewFailed: false
+                        property bool initialized: false
+
+                        onCachePathChanged: {
+                            if (initialized) {
+                                previewPath = ""
+                                needsSaving = false
+                                saving = false
+                                previewFailed = false
+                            }
+                        }
 
                         function loadOriginal() {
                             previewPath = modelData.path
@@ -373,7 +380,7 @@ ShellRoot {
                         Process {
                             id: cacheCheck
                             command: ["test", "-s", thumbnail.cachePath]
-                            running: root.cacheReady
+                            running: root.cacheReady && thumbnail.previewPath.length === 0
 
                             onExited: (exitCode, exitStatus) => {
                                 if (exitCode === 0) {
@@ -393,6 +400,7 @@ ShellRoot {
                         }
 
                         Component.onCompleted: {
+                            initialized = true
                             if (root.cachePrepared && !root.cacheReady)
                                 loadOriginal()
                         }
@@ -402,9 +410,9 @@ ShellRoot {
                             anchors.horizontalCenter: parent.horizontalCenter
                             anchors.bottom: parent.bottom
                             transformOrigin: Item.Bottom
-                            width: Math.round(thumbnail.height * 1.6 * 0.72)
-                            height: Math.round(thumbnail.height * 0.72)
-                            scale: thumbnail.PathView.tileScale
+                            width: gallery.baseWidth
+                            height: gallery.baseHeight
+                            scale: gallery.scaleAt(thumbnail.relativePosition)
                             source: thumbnail.previewPath.length > 0
                             ? root.fileUrl(thumbnail.previewPath) : ""
                             sourceSize: Qt.size(400, 240)
@@ -441,19 +449,18 @@ ShellRoot {
                         }
 
                         MouseArea {
-                            anchors.fill: parent
-                            enabled: !root.busy
+                            width: preview.width * preview.scale
+                            height: preview.height * preview.scale
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.bottom: preview.bottom
+                            enabled: !root.busy && !slide.running
                             onClicked: {
-                                gallery.currentIndex = thumbnail.index
-                                root.selectedIndex = thumbnail.modelData.originalIndex
+                                root.selectedIndex = thumbnail.originalIndex
                                 root.applySelected()
                             }
                         }
                     }
-
-
                 }
-
             }
 
         }
