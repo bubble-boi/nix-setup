@@ -10,7 +10,6 @@ let
       coreutils
       cliphist
       wl-clipboard
-      hyprpicker
       grim
       slurp
     ];
