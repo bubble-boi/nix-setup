@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Lock
+Exec=qs -p /home/qwe/.config/quickshell/lock.qml
+Terminal=false
+StartupNotify=false
+X-KDE-GlobalAccel-CommandShortcut=true
