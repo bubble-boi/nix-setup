@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Launcher
+Exec=qs -p /home/qwe/.config/quickshell/launcher.qml
+Terminal=false
+StartupNotify=false
+X-KDE-GlobalAccel-CommandShortcut=true
