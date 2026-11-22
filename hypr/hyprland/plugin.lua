@@ -15,7 +15,18 @@ if hl.plugin.hyprglass then
         blur_iterations = 0,
     })
 
+    -- Give the launcher/clipboard layer a proper glass preset without
+    -- changing the existing normal-window "pomme" preset.
+    hg.preset("quickshell-panel", {
+        inherits = "pomme",
+        blur_strength = 1.5,
+        blur_iterations = 3,
+        refraction_strength = 0.6,
+        lens_distortion = 0.5,
+    })
+
     hg.layer("HyprGlass", {
+        preset = "quickshell-panel",
         mask_mode = "alpha",
         mask_threshold = 0.05,
     })
