@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Clipboard
+Exec=qs -p /home/qwe/.config/quickshell/clipboard.qml
+Terminal=false
+StartupNotify=false
+X-KDE-GlobalAccel-CommandShortcut=true
