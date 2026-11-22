@@ -82,8 +82,6 @@ ShellRoot {
             height: Math.min(parent.height - 48, 440)
             radius: 12
             color: "#33000000" // translucent alpha mask for Hyprglass
-            border.color: Style.galleryBorderColor
-            border.width: 1
 
             Column {
                 anchors.fill: parent
