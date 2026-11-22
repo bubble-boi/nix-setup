@@ -17,7 +17,7 @@ if hl.plugin.hyprglass then
 
     hg.layer("HyprGlass", {
         mask_mode = "alpha",
-        mask_threshold = 0.001,
+        mask_threshold = 0.05,
     })
 
     hl.window_rule({
