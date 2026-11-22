@@ -53,7 +53,8 @@ ShellRoot {
     function moveSelection(step) {
         if (busy || wallpapers.length === 0)
             return
-            selectedIndex = Math.max(0, Math.min(wallpapers.length - 1, selectedIndex + step))
+            const current = selectedIndex < 0 ? 0 : selectedIndex
+            selectedIndex = (current + step + wallpapers.length) % wallpapers.length
     }
 
     function applySelected() {
