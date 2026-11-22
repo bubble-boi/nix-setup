@@ -114,11 +114,11 @@ ShellRoot {
                                 event.accepted = true
                             } else if (event.key === Qt.Key_Down) {
                                 if (results.count > 0)
-                                    results.currentIndex = Math.min(results.count - 1, results.currentIndex + 1)
+                                    results.currentIndex = ((results.currentIndex < 0 ? -1 : results.currentIndex) + 1) % results.count
                                 event.accepted = true
                             } else if (event.key === Qt.Key_Up) {
                                 if (results.count > 0)
-                                    results.currentIndex = Math.max(0, results.currentIndex - 1)
+                                    results.currentIndex = (results.currentIndex < 0 ? 0 : results.currentIndex + results.count - 1) % results.count
                                 event.accepted = true
                             }
                         }
