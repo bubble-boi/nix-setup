@@ -80,7 +80,6 @@ ShellRoot {
             anchors.centerIn: parent
             width: Math.min(parent.width - 48, 640)
             height: Math.min(parent.height - 48, 490)
-            radius: 12
             color: "#33000000" // translucent alpha mask for Hyprglass
 
             Column {
@@ -88,19 +87,9 @@ ShellRoot {
                 anchors.margins: 18
                 spacing: 12
 
-                Text {
-                    width: parent.width
-                    text: "APPLICATIONS"
-                    color: Style.textColor
-                    font.family: Style.fontFamily
-                    font.bold: true
-                    font.pixelSize: 18
-                }
-
                 Rectangle {
                     width: parent.width
                     height: 46
-                    radius: 6
                     color: "transparent"
 
                     TextInput {
@@ -139,7 +128,7 @@ ShellRoot {
                 ListView {
                     id: results
                     width: parent.width
-                    height: parent.height - 94
+                    height: parent.height - 58
                     clip: true
                     spacing: 4
                     model: root.filteredApps
@@ -156,7 +145,6 @@ ShellRoot {
 
                         width: results.width
                         height: 52
-                        radius: 6
                         color: "transparent"
                         border.color: results.currentIndex === index
                             ? Style.textColor : "transparent"
@@ -177,28 +165,14 @@ ShellRoot {
                                 asynchronous: true
                             }
 
-                            Column {
+                            Text {
                                 width: parent.width - 44
                                 anchors.verticalCenter: parent.verticalCenter
-                                spacing: 2
-
-                                Text {
-                                    width: parent.width
-                                    text: modelData.name
-                                    color: Style.textColor
-                                    font.family: Style.fontFamily
-                                    font.pixelSize: 15
-                                    elide: Text.ElideRight
-                                }
-                                Text {
-                                    width: parent.width
-                                    text: modelData.genericName || modelData.comment || ""
-                                    color: Style.galleryMutedColor
-                                    font.family: Style.monoFontFamily
-                                    font.pixelSize: 11
-                                    elide: Text.ElideRight
-                                    visible: text.length > 0
-                                }
+                                text: modelData.name
+                                color: Style.textColor
+                                font.family: Style.fontFamily
+                                font.pixelSize: 15
+                                elide: Text.ElideRight
                             }
                         }
 
