@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Work Terminal
+Exec=alacritty --config-file /home/qwe/.config/alacritty/work.toml -e tmux new-session -A -s main
+Terminal=false
+StartupNotify=false
+X-KDE-GlobalAccel-CommandShortcut=true
