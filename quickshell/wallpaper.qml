@@ -296,14 +296,15 @@ ShellRoot {
 
             Column {
                 anchors.fill: parent
-                anchors.margins: 14
-                spacing: 8
+                // Use the full layer width; no side padding or inner clipping.
+                anchors.margins: 0
+                spacing: 0
 
                 PathView {
                     id: gallery
                     width: parent.width
                     height: parent.height
-                    clip: true
+                    clip: false
                     model: root.carouselEntries
                     interactive: false
 
@@ -319,15 +320,31 @@ ShellRoot {
                     highlightRangeMode: PathView.StrictlyEnforceRange
                     highlightMoveDuration: 220
 
+                    // Smoothly scale each image from 0.5 at the far sides
+                    // to 1.3 at the selected position in the center.
                     path: Path {
                         startX: gallery.width / 2
                             - gallery.pathItemCount * gallery.tileStep / 2
                         startY: gallery.height / 2
+                        PathAttribute { name: "tileScale"; value: 0.5 }
+                        PathAttribute { name: "tileDepth"; value: 0 }
+
+                        PathLine {
+                            x: gallery.width / 2
+                            y: gallery.height / 2
+                        }
+                        PathPercent { value: 0.5 }
+                        PathAttribute { name: "tileScale"; value: 1.3 }
+                        PathAttribute { name: "tileDepth"; value: 10 }
+
                         PathLine {
                             x: gallery.width / 2
                                 + gallery.pathItemCount * gallery.tileStep / 2
                             y: gallery.height / 2
                         }
+                        PathPercent { value: 1.0 }
+                        PathAttribute { name: "tileScale"; value: 0.5 }
+                        PathAttribute { name: "tileDepth"; value: 0 }
                     }
 
                     delegate: Item {
@@ -337,7 +354,7 @@ ShellRoot {
 
                         width: gallery.tileWidth
                         height: gallery.height
-                        z: PathView.isCurrentItem ? 1 : 0
+                        z: PathView.tileDepth
 
                         // Cache names include path and modification time.
                         // Visible delegates check for a saved PNG before decoding originals.
@@ -382,17 +399,12 @@ ShellRoot {
 
                         Image {
                             id: preview
-                            anchors.centerIn: parent
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.bottom: parent.bottom
+                            transformOrigin: Item.Bottom
                             width: Math.round(thumbnail.height * 1.6 * 0.72)
                             height: Math.round(thumbnail.height * 0.72)
-                            scale: thumbnail.PathView.isCurrentItem ? 1.18 : 1.0
-
-                            Behavior on scale {
-                                NumberAnimation {
-                                    duration: 200
-                                    easing.type: Easing.OutCubic
-                                }
-                            }
+                            scale: thumbnail.PathView.tileScale
                             source: thumbnail.previewPath.length > 0
                             ? root.fileUrl(thumbnail.previewPath) : ""
                             sourceSize: Qt.size(400, 240)
