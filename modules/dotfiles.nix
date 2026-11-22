@@ -7,6 +7,8 @@ let
   dotfiles = {
     ".config/hypr" = ../hypr;
     ".config/alacritty" = ../alacritty;
+    ".config/kwinrc" = ../kde/kwinrc;
+    ".config/kglobalshortcutsrc" = ../kde/kglobalshortcutsrc;
     ".config/tmux" = ../tmux;
     ".config/quickshell" = ../quickshell;
     ".zshrc" = builtins.path {
@@ -75,6 +77,18 @@ in
           fi
         '') dotfiles
       )}
+
+      ${pkgs.coreutils}/bin/mkdir -p -- "${homeDir}/.local/share/applications"
+      for src in ${../kde/applications}/*.desktop; do
+        name=$("${pkgs.coreutils}/bin/basename" -- "$src")
+        dst="${homeDir}/.local/share/applications/$name"
+        if [ -L "$dst" ]; then
+          ${pkgs.coreutils}/bin/rm -- "$dst"
+        elif [ -e "$dst" ]; then
+          ${pkgs.coreutils}/bin/mv -- "$dst" "$dst.bak.$("${pkgs.coreutils}/bin/date" +%s%N)"
+        fi
+        ${pkgs.coreutils}/bin/ln -s -- "$src" "$dst"
+      done
       DOTFILES
     '';
   };
