@@ -25,4 +25,5 @@ Scope {
         }
     }
 
+    Notifications {}
 }
