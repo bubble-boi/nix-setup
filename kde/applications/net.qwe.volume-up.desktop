@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Volume Up
+Exec=wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+
+Terminal=false
+StartupNotify=false
+X-KDE-GlobalAccel-CommandShortcut=true
