@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Screenshot Full
+Exec=grab full
+Terminal=false
+StartupNotify=false
+X-KDE-GlobalAccel-CommandShortcut=true
