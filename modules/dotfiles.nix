@@ -6,8 +6,6 @@ let
 
   dotfiles = {
     ".config/alacritty" = ../alacritty;
-    ".config/kwinrc" = ../kde/kwinrc;
-    ".config/kglobalshortcutsrc" = ../kde/kglobalshortcutsrc;
     ".config/tmux" = ../tmux;
     ".config/quickshell" = ../quickshell;
     ".zprofile" = ../.zprofile;
@@ -78,16 +76,29 @@ in
         '') dotfiles
       )}
 
-      ${pkgs.coreutils}/bin/mkdir -p -- "${homeDir}/.local/share/applications"
-      for src in ${../kde/applications}/*.desktop; do
-        name=$("${pkgs.coreutils}/bin/basename" -- "$src")
-        dst="${homeDir}/.local/share/applications/$name"
+      # Remove only KDE shortcuts previously installed by this repository.
+      for name in kwinrc kglobalshortcutsrc; do
+        dst="$configDir/$name"
         if [ -L "$dst" ]; then
-          ${pkgs.coreutils}/bin/rm -- "$dst"
-        elif [ -e "$dst" ]; then
-          ${pkgs.coreutils}/bin/mv -- "$dst" "$dst.bak.$("${pkgs.coreutils}/bin/date" +%s%N)"
+          target=$(${pkgs.coreutils}/bin/readlink -- "$dst")
+          case "$target" in
+            /nix/store/*-"$name"|/nix/store/*/kde/"$name")
+              ${pkgs.coreutils}/bin/rm -- "$dst"
+              ;;
+          esac
         fi
-        ${pkgs.coreutils}/bin/ln -s -- "$src" "$dst"
+      done
+
+      # Remove custom shortcut launchers, leaving native Plasma defaults.
+      for dst in "${homeDir}"/.local/share/applications/net.qwe.*.desktop; do
+        if [ -L "$dst" ]; then
+          target=$(${pkgs.coreutils}/bin/readlink -- "$dst")
+          case "$target" in
+            /nix/store/*/net.qwe.*.desktop)
+              ${pkgs.coreutils}/bin/rm -- "$dst"
+              ;;
+          esac
+        fi
       done
       DOTFILES
     '';
