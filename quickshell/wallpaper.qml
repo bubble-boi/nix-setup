@@ -380,25 +380,20 @@ ShellRoot {
 
                         // Keep the image inside its own frame, with the filename
                         // fully outside the frame beneath it.
-                        Rectangle {
+                        Item {
                             id: imageFrame
                             anchors.top: parent.top
                             anchors.left: parent.left
                             anchors.right: parent.right
                             anchors.bottom: filenameLabel.top
                             anchors.bottomMargin: 8
-                            radius: 6
-                            color: Style.galleryTileColor
-                            border.color: root.selectedIndex === index
-                            ? Style.textColor : Style.galleryBorderColor
-                            border.width: root.selectedIndex === index ? 3 : 1
                             clip: true
                         }
 
                         Image {
                             id: preview
                             anchors.fill: imageFrame
-                            anchors.margins: 4
+                            opacity: root.selectedIndex === index ? 1 : 0.7
                             source: thumbnail.previewPath.length > 0
                             ? root.fileUrl(thumbnail.previewPath) : ""
                             sourceSize: Qt.size(400, 240)
@@ -488,8 +483,6 @@ ShellRoot {
                 height: 96
                 radius: 8
                 color: Style.galleryTileColor
-                border.color: Style.textColor
-                border.width: 1
                 visible: root.confirmDelete
                 z: 10
 
