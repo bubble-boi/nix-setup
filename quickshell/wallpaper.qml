@@ -17,7 +17,6 @@ ShellRoot {
 
     property var wallpapers: []
     property int selectedIndex: -1
-    property bool confirmDelete: false
     property bool busy: false
     property string statusMessage: ""
     property string applyingWallpaper: ""
@@ -52,13 +51,13 @@ ShellRoot {
     }
 
     function moveSelection(step) {
-        if (busy || confirmDelete || wallpapers.length === 0)
+        if (busy || wallpapers.length === 0)
             return
             selectedIndex = Math.max(0, Math.min(wallpapers.length - 1, selectedIndex + step))
     }
 
     function applySelected() {
-        if (busy || confirmDelete || selectedIndex < 0 || selectedIndex >= wallpapers.length)
+        if (busy || selectedIndex < 0 || selectedIndex >= wallpapers.length)
             return
 
             busy = true
@@ -68,16 +67,10 @@ ShellRoot {
             listMonitors.exec(["hyprctl", "-i", "0", "monitors"])
     }
 
-    function requestDelete() {
-        if (!busy && selectedIndex >= 0 && selectedIndex < wallpapers.length)
-            confirmDelete = true
-    }
-
     function deleteSelected() {
         if (busy || selectedIndex < 0 || selectedIndex >= wallpapers.length)
             return
 
-            confirmDelete = false
             busy = true
             statusMessage = "Deleting wallpaper..."
             deleteProcess.exec([
@@ -250,16 +243,9 @@ ShellRoot {
 
             Keys.onPressed: event => {
                 if (event.key === Qt.Key_Escape) {
-                    if (root.confirmDelete)
-                        root.confirmDelete = false
-                        else if (!root.busy)
-                            Qt.quit()
-                            event.accepted = true
-                } else if (root.confirmDelete) {
-                    if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                        root.deleteSelected()
-                        event.accepted = true
-                    }
+                    if (!root.busy)
+                        Qt.quit()
+                    event.accepted = true
                 } else if (event.key === Qt.Key_Left || event.key === Qt.Key_Up) {
                     root.moveSelection(-1)
                     event.accepted = true
@@ -270,7 +256,7 @@ ShellRoot {
                     root.applySelected()
                     event.accepted = true
                 } else if (event.key === Qt.Key_Delete && (event.modifiers & Qt.ShiftModifier)) {
-                    root.requestDelete()
+                    root.deleteSelected()
                     event.accepted = true
                 }
             }
@@ -350,8 +336,7 @@ ShellRoot {
                             anchors.fill: parent
                             radius: 6
                             color: "transparent"
-                            border.color: root.confirmDelete && root.selectedIndex === index
-                                ? Style.errorColor : Style.textColor
+                            border.color: Style.textColor
                             border.width: root.selectedIndex === index ? 3 : 0
                             clip: true
                         }
@@ -397,7 +382,7 @@ ShellRoot {
 
                         MouseArea {
                             anchors.fill: parent
-                            enabled: !root.busy && !root.confirmDelete
+                            enabled: !root.busy
                             onClicked: {
                                 root.selectedIndex = thumbnail.index
                                 root.applySelected()
