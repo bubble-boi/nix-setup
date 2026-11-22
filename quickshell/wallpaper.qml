@@ -277,18 +277,27 @@ ShellRoot {
                     model: root.wallpapers
                     currentIndex: root.selectedIndex
                     cacheBuffer: 400
+                    interactive: false
 
-                    onCurrentIndexChanged: {
-                        if (currentIndex >= 0)
-                            positionViewAtIndex(currentIndex, ListView.Contain)
-                    }
+                    // Keep even the first and last thumbnails at the screen center.
+                    readonly property real tileWidth: Math.round(height * 1.6 * 0.82)
+                    readonly property real sideMargin: Math.max(0, (width - tileWidth) / 2)
+                    leftMargin: sideMargin
+                    rightMargin: sideMargin
+
+                    // Move the image strip under a stationary center selection.
+                    highlightRangeMode: ListView.StrictlyEnforceRange
+                    preferredHighlightBegin: sideMargin
+                    preferredHighlightEnd: sideMargin + tileWidth
+                    highlightMoveDuration: 220
+                    highlightMoveVelocity: -1
 
                     delegate: Item {
                         id: thumbnail
                         required property int index
                         required property var modelData
 
-                        width: Math.round(gallery.height * 1.6 * 0.82)
+                        width: gallery.tileWidth
                         height: gallery.height
                         z: root.selectedIndex === index ? 1 : 0
 
