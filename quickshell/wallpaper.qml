@@ -334,14 +334,24 @@ ShellRoot {
                     return distance < 0 ? -x : x
                 }
 
-                function advance(step) {
+                function advance(step, fromQueue = false) {
                     if (root.busy || root.wallpapers.length < 2)
                         return
+
                     const direction = step < 0 ? -1 : 1
+
+                    // Commit keyboard selection immediately, not at the end
+                    // of the slide. Delegates remain bound to baseIndex,
+                    // so updating selectedIndex does not reload images.
+                    if (!fromQueue)
+                        root.selectedIndex = root.wrapIndex(
+                            root.selectedIndex + direction, root.wallpapers.length)
+
                     if (slide.running) {
                         queuedSteps += direction
                         return
                     }
+
                     slide.from = position
                     slide.to = position + direction
                     slide.start()
@@ -356,15 +366,13 @@ ShellRoot {
                     duration: 220
                     easing.type: Easing.InOutCubic
                     onFinished: {
-                        root.selectedIndex = root.wrapIndex(
-                            gallery.baseIndex + Math.round(gallery.position),
-                            root.wallpapers.length)
                         gallery.recycle()
 
                         if (gallery.queuedSteps !== 0) {
                             const next = gallery.queuedSteps < 0 ? -1 : 1
                             gallery.queuedSteps -= next
-                            Qt.callLater(function() { gallery.advance(next) })
+                            // The queued key press already changed selection.
+                            Qt.callLater(function() { gallery.advance(next, true) })
                         }
                     }
                 }
