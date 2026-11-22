@@ -158,8 +158,10 @@ ShellRoot {
                         width: results.width
                         height: 44
                         radius: 6
-                        color: results.currentIndex === index
-                            ? Style.galleryTileColor : "transparent"
+                        color: "transparent"
+                        border.color: results.currentIndex === index
+                            ? Style.textColor : "transparent"
+                        border.width: results.currentIndex === index ? 2 : 0
 
                         Text {
                             anchors.fill: parent
