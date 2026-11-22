@@ -228,7 +228,7 @@ ShellRoot {
     PanelWindow {
         id: galleryWindow
 
-        WlrLayershell.namespace: "quickshell:wallpaper"
+        WlrLayershell.namespace: "HyprGlass"
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
 
@@ -239,14 +239,14 @@ ShellRoot {
         }
 
         implicitHeight: screen ? Math.round(screen.height * 0.25) : 270
-        color: Style.galleryBackgroundColor
+        color: "transparent"
         exclusionMode: ExclusionMode.Ignore
         focusable: true
 
         Rectangle {
             id: content
             anchors.fill: parent
-            color: Style.galleryBackgroundColor
+            color: "#01000000" // alpha mask for Hyprglass, visually transparent
             focus: true
 
             Keys.onPressed: event => {
