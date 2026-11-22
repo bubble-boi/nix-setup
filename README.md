@@ -55,7 +55,9 @@ mkdir -p /mnt/etc
 git clone https://github.com/bubble-boi/nix-setup.git /mnt/etc/nixos
 nixos-generate-config --root /mnt
 
-nixos-install --flake path:/mnt/etc/nixos#nixos
+nix-channel --add https://channels.nixos.org/nixos-26.05 nixos
+nix-channel --update
+nixos-install --no-flake --root /mnt
 nixos-enter --root /mnt -c 'passwd qwe'
 ```
 
@@ -73,7 +75,10 @@ reboot
 ### Rebuild
 
 ```bash
-rebuild && hyprctl -i 0 reload
+sudo nix-channel --add https://channels.nixos.org/nixos-26.05 nixos
+sudo nix-channel --update
+rebuild
+# Automatic updates run daily at 03:00 via system.autoUpgrade
 ```
 
 ## Shortcuts
