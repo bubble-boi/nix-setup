@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Terminal
+Exec=alacritty
+Terminal=false
+StartupNotify=false
+X-KDE-GlobalAccel-CommandShortcut=true
