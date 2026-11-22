@@ -80,7 +80,6 @@ ShellRoot {
             anchors.centerIn: parent
             width: Math.min(parent.width - 48, 720)
             height: Math.min(parent.height - 48, 440)
-            radius: 12
             color: "#33000000" // translucent alpha mask for Hyprglass
 
             Column {
@@ -88,19 +87,9 @@ ShellRoot {
                 anchors.margins: 18
                 spacing: 12
 
-                Text {
-                    width: parent.width
-                    text: "CLIPBOARD"
-                    color: Style.textColor
-                    font.family: Style.fontFamily
-                    font.bold: true
-                    font.pixelSize: 18
-                }
-
                 Rectangle {
                     width: parent.width
                     height: 46
-                    radius: 6
                     color: "transparent"
 
                     TextInput {
@@ -140,7 +129,7 @@ ShellRoot {
                 ListView {
                     id: results
                     width: parent.width
-                    height: parent.height - 94
+                    height: parent.height - 58
                     clip: true
                     spacing: 4
                     model: root.filteredEntries
@@ -157,7 +146,6 @@ ShellRoot {
 
                         width: results.width
                         height: 44
-                        radius: 6
                         color: "transparent"
                         border.color: results.currentIndex === index
                             ? Style.textColor : "transparent"
