@@ -5,7 +5,6 @@ let
   homeDir = "/home/${username}";
 
   dotfiles = {
-    ".config/hypr" = ../hypr;
     ".config/alacritty" = ../alacritty;
     ".config/kwinrc" = ../kde/kwinrc;
     ".config/kglobalshortcutsrc" = ../kde/kglobalshortcutsrc;
