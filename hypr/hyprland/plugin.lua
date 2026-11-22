@@ -5,6 +5,7 @@ if hl.plugin.hyprglass then
         enabled = false,
         default_theme = "dark",
         default_preset = "pomme",
+        layers = { enabled = true },
     })
 
     hg.preset("pomme", {
@@ -12,6 +13,11 @@ if hl.plugin.hyprglass then
         lens_distortion = 2.0,
         blur_strength = 0.5,
         blur_iterations = 0,
+    })
+
+    hg.layer("HyprGlass", {
+        mask_mode = "alpha",
+        mask_threshold = 0.001,
     })
 
     hl.window_rule({
