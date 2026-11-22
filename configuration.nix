@@ -115,7 +115,6 @@
     spotify
     discord
     alacritty
-    hyprpaper
     kdePackages.kate
     kdePackages.konsole
     kdePackages.markdownpart
