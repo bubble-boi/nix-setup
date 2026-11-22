@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Volume Mute
+Exec=wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+Terminal=false
+StartupNotify=false
+X-KDE-GlobalAccel-CommandShortcut=true
