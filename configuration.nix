@@ -42,28 +42,8 @@
     enable = true;
     syntaxHighlighting.enable = true;
 
-    loginShellInit = ''
-      if [[ "$(tty)" == "/dev/tty1" ]] && [[ -z "$WAYLAND_DISPLAY" ]]; then
-        exec start-hyprland
-      fi
-    '';
-
     interactiveShellInit = ''
       source ${pkgs.zsh-autopair}/share/zsh/zsh-autopair/autopair.zsh
-
-
-      float_app() {
-        hyprctl -i 0 dispatch \
-          "hl.dsp.exec_cmd([[$1]], {
-            float = true,
-            size = {
-              [[(monitor_w*0.5)]],
-              [[(monitor_h*0.5)]],
-            },
-            center = true,
-          })"
-      }
-
     '';
 
     shellAliases = {
@@ -71,7 +51,14 @@
     };
   };
 
-  programs.hyprland.enable = true;
+  services.xserver.enable = true;
+  services.displayManager.sddm = {
+    enable = true;
+    wayland.enable = true;
+  };
+  services.desktopManager.plasma6.enable = true;
+
+  services.displayManager.defaultSession = "plasma";
 
   security.pam.services.quickshell = {};
 
