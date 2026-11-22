@@ -1,7 +1,3 @@
--- PLUGIN
-hl.plugin.load("/run/current-system/sw/lib/hyprglass.so")
-require("hyprland.plugin")
-
 -- DISPLAY
 require("hyprland.monitors-default")
 
