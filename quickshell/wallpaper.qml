@@ -17,6 +17,27 @@ ShellRoot {
 
     property var wallpapers: []
     property int selectedIndex: -1
+
+    // Repeat short galleries so both sides remain populated. PathView itself
+    // wraps around when reaching the last model item.
+    readonly property var carouselEntries: {
+        const count = wallpapers.length
+        if (count === 0)
+            return []
+
+        const minCount = gallery.pathItemCount + 2
+        const length = Math.max(count, Math.ceil(minCount / count) * count)
+        const entries = []
+        for (let i = 0; i < length; ++i) {
+            const wallpaper = wallpapers[i % count]
+            entries.push({
+                path: wallpaper.path,
+                mtime: wallpaper.mtime,
+                originalIndex: i % count
+            })
+        }
+        return entries
+    }
     property bool busy: false
     property string statusMessage: ""
     property string applyingWallpaper: ""
@@ -51,10 +72,16 @@ ShellRoot {
     }
 
     function moveSelection(step) {
-        if (busy || wallpapers.length === 0)
+        if (busy || wallpapers.length < 2 || gallery.count === 0)
             return
-            const current = selectedIndex < 0 ? 0 : selectedIndex
-            selectedIndex = (current + step + wallpapers.length) % wallpapers.length
+
+        // Move exactly one visual tile, even when crossing the last/first image.
+        if (step < 0)
+            gallery.decrementCurrentIndex()
+        else
+            gallery.incrementCurrentIndex()
+
+        selectedIndex = gallery.currentIndex % wallpapers.length
     }
 
     function applySelected() {
@@ -139,6 +166,11 @@ ShellRoot {
                 if (index < 0 && entries.length > 0)
                     index = Math.min(Math.max(oldIndex, 0), entries.length - 1)
                     root.selectedIndex = index
+                    // Restore the selection after PathView's model has changed.
+                    Qt.callLater(function() {
+                        if (gallery.count > 0 && root.selectedIndex >= 0)
+                            gallery.currentIndex = root.selectedIndex
+                    })
             }
         }
 
@@ -267,30 +299,36 @@ ShellRoot {
                 anchors.margins: 14
                 spacing: 8
 
-                ListView {
+                PathView {
                     id: gallery
                     width: parent.width
                     height: parent.height
                     clip: true
-                    orientation: ListView.Horizontal
-                    spacing: 12
-                    model: root.wallpapers
-                    currentIndex: root.selectedIndex
-                    cacheBuffer: 400
+                    model: root.carouselEntries
                     interactive: false
 
-                    // Keep even the first and last thumbnails at the screen center.
                     readonly property real tileWidth: Math.round(height * 1.6 * 0.82)
-                    readonly property real sideMargin: Math.max(0, (width - tileWidth) / 2)
-                    leftMargin: sideMargin
-                    rightMargin: sideMargin
+                    readonly property real tileStep: tileWidth + 12
 
-                    // Move the image strip under a stationary center selection.
-                    highlightRangeMode: ListView.StrictlyEnforceRange
-                    preferredHighlightBegin: sideMargin
-                    preferredHighlightEnd: sideMargin + 1
+                    // Odd number of equally spaced tiles, with the selected tile
+                    // always at the center of the horizontal path.
+                    pathItemCount: Math.max(3,
+                        2 * Math.ceil(width / (2 * tileStep)) + 3)
+                    preferredHighlightBegin: 0.5
+                    preferredHighlightEnd: 0.5
+                    highlightRangeMode: PathView.StrictlyEnforceRange
                     highlightMoveDuration: 220
-                    highlightMoveVelocity: -1
+
+                    path: Path {
+                        startX: gallery.width / 2
+                            - gallery.pathItemCount * gallery.tileStep / 2
+                        startY: gallery.height / 2
+                        PathLine {
+                            x: gallery.width / 2
+                                + gallery.pathItemCount * gallery.tileStep / 2
+                            y: gallery.height / 2
+                        }
+                    }
 
                     delegate: Item {
                         id: thumbnail
@@ -299,7 +337,7 @@ ShellRoot {
 
                         width: gallery.tileWidth
                         height: gallery.height
-                        z: root.selectedIndex === index ? 1 : 0
+                        z: PathView.isCurrentItem ? 1 : 0
 
                         // Cache names include path and modification time.
                         // Visible delegates check for a saved PNG before decoding originals.
@@ -347,7 +385,7 @@ ShellRoot {
                             anchors.centerIn: parent
                             width: Math.round(thumbnail.height * 1.6 * 0.72)
                             height: Math.round(thumbnail.height * 0.72)
-                            scale: root.selectedIndex === index ? 1.18 : 1.0
+                            scale: thumbnail.PathView.isCurrentItem ? 1.18 : 1.0
 
                             Behavior on scale {
                                 NumberAnimation {
@@ -394,7 +432,8 @@ ShellRoot {
                             anchors.fill: parent
                             enabled: !root.busy
                             onClicked: {
-                                root.selectedIndex = thumbnail.index
+                                gallery.currentIndex = thumbnail.index
+                                root.selectedIndex = thumbnail.modelData.originalIndex
                                 root.applySelected()
                             }
                         }
