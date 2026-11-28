@@ -26,9 +26,8 @@ Scope {
         hideAnimation.from = slideTranslation.y
         hideAnimation.start()
     }
-    readonly property int panelSize: 240
+    readonly property int panelWidth: 450
     readonly property int screenMargin: 12
-    readonly property int contentPadding: 14
 
     NotificationServer {
         id: server
@@ -88,8 +87,8 @@ Scope {
             right: root.screenMargin
         }
 
-        implicitWidth: root.panelSize
-        implicitHeight: root.panelSize
+        implicitWidth: root.panelWidth
+        implicitHeight: implicitWidth * 2 / 3
 
         color: Style.transparentColor
         exclusionMode: ExclusionMode.Ignore
@@ -104,32 +103,32 @@ Scope {
                 y: notificationWindow.implicitHeight
             }
 
-            BarItem {
+            Image {
                 id: background
                 anchors.fill: parent
-                sideInset: 0
                 source: "file://" + Quickshell.env("HOME") + "/.local/share/img/notify_bg.png"
+                fillMode: Image.PreserveAspectFit
+                smooth: true
+                mipmap: true
             }
 
             Column {
                 id: contents
-                anchors {
-                    top: parent.top
-                    topMargin: root.contentPadding
-                    left: parent.left
-                    leftMargin: root.contentPadding
-                    right: parent.right
-                    rightMargin: root.contentPadding
-                }
-                spacing: 6
+                x: parent.width * 0.17
+                y: parent.height * 0.26
+                width: parent.width * 0.66
+                height: parent.height * 0.50
+                spacing: 12
+                clip: true
 
                 Text {
                     width: parent.width
                     text: root.summaryText
                     color: Style.darkTextColor
-                    font.family: Style.monoFontFamily
+                    font.family: Style.fontFamily
                     font.bold: true
-                    font.pixelSize: Style.inputFontSize
+                    font.pixelSize: 18
+                    horizontalAlignment: Text.AlignHCenter
                     textFormat: Text.PlainText
                     wrapMode: Text.Wrap
                     maximumLineCount: 2
@@ -141,11 +140,12 @@ Scope {
                     text: root.bodyText
                     visible: text.length > 0
                     color: Style.darkTextColor
-                    font.family: Style.monoFontFamily
-                    font.pixelSize: Style.bodyFontSize
+                    font.family: Style.fontFamily
+                    font.pixelSize: 14
+                    horizontalAlignment: Text.AlignHCenter
                     textFormat: Text.PlainText
                     wrapMode: Text.Wrap
-                    maximumLineCount: 8
+                    maximumLineCount: 4
                     elide: Text.ElideRight
                 }
             }
