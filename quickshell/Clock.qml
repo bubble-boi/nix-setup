@@ -19,7 +19,7 @@ Item {
     }
 
     Timer {
-        interval: 100
+        interval: Style.lockEnterDelay
         running: root.animateToCenter
         repeat: false
 
@@ -42,7 +42,7 @@ Item {
             enabled: root.animateToCenter
 
             NumberAnimation {
-                duration: 450
+                duration: Style.lockAnimationDuration
                 easing.type: Easing.InOutCubic
             }
         }

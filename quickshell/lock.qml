@@ -28,7 +28,7 @@ ShellRoot {
 
     Timer {
         id: enterTransition
-        interval: 100
+        interval: Style.lockEnterDelay
         running: true
         repeat: false
         onTriggered: root.showLockUI = true
@@ -97,7 +97,7 @@ ShellRoot {
 
                 Image {
                     anchors.fill: parent
-                    source: "file://" + Quickshell.env("HOME") + "/.local/share/img/wallpaper.png"
+                    source: Style.wallpaper
 
                     fillMode: Image.PreserveAspectCrop
                     asynchronous: false
@@ -113,7 +113,7 @@ ShellRoot {
 
                         Behavior on blur {
                             NumberAnimation {
-                                duration: 450
+                                duration: Style.lockAnimationDuration
                                 easing.type: Easing.InOutCubic
                             }
                         }
@@ -138,7 +138,7 @@ ShellRoot {
 
                         Behavior on opacity {
                             NumberAnimation {
-                                duration: 450
+                                duration: Style.lockAnimationDuration
                                 easing.type: Easing.InOutCubic
                             }
                         }
@@ -154,7 +154,7 @@ ShellRoot {
                     height: 56
 
                     color: Style.textColor
-                    font.pixelSize: 14
+                    font.pixelSize: Style.lockFontSize
 
                     horizontalAlignment: TextInput.AlignHCenter
                     verticalAlignment: TextInput.AlignVCenter
@@ -167,7 +167,7 @@ ShellRoot {
 
                     Behavior on opacity {
                         NumberAnimation {
-                            duration: 450
+                            duration: Style.lockAnimationDuration
                             easing.type: Easing.InOutCubic
                         }
                     }
@@ -196,14 +196,14 @@ ShellRoot {
 
                     text: root.status
                     color: Style.errorColor
-                    font.pixelSize: 14
+                    font.pixelSize: Style.lockFontSize
                     font.bold: true
 
                     opacity: root.showLockUI ? 1.0 : 0.0
 
                     Behavior on opacity {
                         NumberAnimation {
-                            duration: 450
+                            duration: Style.lockAnimationDuration
                             easing.type: Easing.InOutCubic
                         }
                     }

@@ -80,7 +80,7 @@ ShellRoot {
         implicitWidth: screen ? Math.min(screen.width - 48, 720) : 720
         implicitHeight: screen ? Math.min(screen.height - 48, 440) : 440
 
-        color: "transparent"
+        color: Style.transparentColor
         exclusionMode: ExclusionMode.Ignore
         focusable: true
 
@@ -92,7 +92,7 @@ ShellRoot {
             Canvas {
                 id: background
                 anchors.fill: parent
-                readonly property url source: "file://" + Quickshell.env("HOME") + "/.local/share/img/term_bg.png"
+                readonly property url source: Style.terminalBackground
 
                 onAvailableChanged: if (available) { loadImage(source); requestPaint() }
                 onImageLoaded: requestPaint()
@@ -109,21 +109,21 @@ ShellRoot {
                     ctx.beginPath()
                     ctx.rect(0, 0, w, h)
                     ctx.clip()
-                    ctx.fillStyle = "#181818"
+                    ctx.fillStyle = Style.panelFallbackColor
                     ctx.fillRect(0, 0, w, h)
                     if (isImageLoaded(background.source))
                         ctx.drawImage(background.source, 0, 0)
 
-                    ctx.strokeStyle = "#000000"
+                    ctx.strokeStyle = Style.shadowColor
                     ctx.lineJoin = "miter"
-                    for (let i = 3; i >= 1; --i) {
-                        ctx.lineWidth = i * 2
-                        ctx.globalAlpha = i === 1 ? 0.10 : 0.055
+                    for (let i = Style.shadowLayers; i >= 1; --i) {
+                        ctx.lineWidth = i * Style.shadowStrokeStep
+                        ctx.globalAlpha = i === 1 ? Style.shadowInnerOpacity : Style.shadowOuterOpacity
                         ctx.stroke()
                     }
                     ctx.globalAlpha = 1
 
-                    const depth = Math.min(4, w / 2, h / 2)
+                    const depth = Math.min(Style.shadowDepth, w / 2, h / 2)
                     for (const edge of [
                         [0, 0, 0, depth, 0, 0, w, depth],
                         [0, h, 0, h - depth, 0, h - depth, w, depth],
@@ -131,8 +131,8 @@ ShellRoot {
                         [w, 0, w - depth, 0, w - depth, 0, depth, h]
                     ]) {
                         const shade = ctx.createLinearGradient(edge[0], edge[1], edge[2], edge[3])
-                        shade.addColorStop(0, "rgba(0,0,0,0.35)")
-                        shade.addColorStop(1, "rgba(0,0,0,0)")
+                        shade.addColorStop(0, Style.shadowEdgeColor)
+                        shade.addColorStop(1, Style.shadowClearColor)
                         ctx.fillStyle = shade
                         ctx.fillRect(edge[4], edge[5], edge[6], edge[7])
                     }
@@ -148,15 +148,15 @@ ShellRoot {
                 Rectangle {
                     width: parent.width
                     height: 46
-                    color: "transparent"
+                    color: Style.transparentColor
 
                     TextInput {
                         id: searchInput
                         anchors.fill: parent
                         anchors.margins: 12
-                        color: "#000000"
+                        color: Style.darkTextColor
                         font.family: Style.monoFontFamily
-                        font.pixelSize: 15
+                        font.pixelSize: Style.inputFontSize
                         verticalAlignment: TextInput.AlignVCenter
                         focus: true
                         enabled: !root.busy
@@ -205,9 +205,9 @@ ShellRoot {
 
                         width: results.width
                         height: 44
-                        color: "transparent"
+                        color: Style.transparentColor
                         border.color: results.currentIndex === index
-                            ? "#000000" : "transparent"
+                            ? Style.selectionColor : Style.transparentColor
                         border.width: results.currentIndex === index ? 2 : 0
 
                         Text {
@@ -216,9 +216,9 @@ ShellRoot {
                             verticalAlignment: Text.AlignVCenter
                             textFormat: Text.PlainText
                             text: modelData.label
-                            color: "#000000"
+                            color: Style.darkTextColor
                             font.family: Style.monoFontFamily
-                            font.pixelSize: 13
+                            font.pixelSize: Style.bodyFontSize
                             elide: Text.ElideRight
                         }
 
@@ -232,7 +232,7 @@ ShellRoot {
                     Text {
                         anchors.centerIn: parent
                         text: root.status !== "" ? root.status : "No matching entries"
-                        color: "#505050"
+                        color: Style.mutedTextColor
                         font.family: Style.monoFontFamily
                         visible: results.count === 0 || root.status !== ""
                     }
@@ -246,7 +246,7 @@ ShellRoot {
             target: surface
             property: "opacity"
             to: 1
-            duration: 280
+            duration: Style.panelAnimationDuration
             easing.type: Easing.OutCubic
         }
 
@@ -255,7 +255,7 @@ ShellRoot {
             target: surface
             property: "opacity"
             to: 0
-            duration: 280
+            duration: Style.panelAnimationDuration
             easing.type: Easing.InCubic
             onFinished: Qt.quit()
         }

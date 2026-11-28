@@ -38,7 +38,7 @@ Item {
             ctx.lineTo(left, h)
             ctx.closePath()
             ctx.clip()
-            ctx.fillStyle = "#181818"
+            ctx.fillStyle = Style.panelFallbackColor
             ctx.fillRect(0, 0, w, h)
             if (isImageLoaded(root.source))
                 ctx.drawImage(root.source, -root.backgroundOffsetX, 0)
@@ -54,20 +54,20 @@ Item {
             if (!root.flushLeft)
                 ctx.lineTo(topLeft, 0)
 
-            ctx.strokeStyle = "#000000"
+            ctx.strokeStyle = Style.shadowColor
             ctx.lineJoin = "miter"
             ctx.lineCap = "butt"
-            for (let i = 3; i >= 1; --i) {
-                ctx.lineWidth = i * 2
-                ctx.globalAlpha = i === 1 ? 0.10 : 0.055
+            for (let i = Style.shadowLayers; i >= 1; --i) {
+                ctx.lineWidth = i * Style.shadowStrokeStep
+                ctx.globalAlpha = i === 1 ? Style.shadowInnerOpacity : Style.shadowOuterOpacity
                 ctx.stroke()
             }
             ctx.globalAlpha = 1
 
-            const shadowDepth = Math.min(4, h)
+            const shadowDepth = Math.min(Style.shadowDepth, h)
             const bottomShade = ctx.createLinearGradient(0, h - shadowDepth, 0, h)
-            bottomShade.addColorStop(0, "rgba(0,0,0,0)")
-            bottomShade.addColorStop(1, "rgba(0,0,0,0.35)")
+            bottomShade.addColorStop(0, Style.shadowClearColor)
+            bottomShade.addColorStop(1, Style.shadowEdgeColor)
             ctx.fillStyle = bottomShade
             ctx.fillRect(0, h - shadowDepth, w, shadowDepth)
             ctx.restore()

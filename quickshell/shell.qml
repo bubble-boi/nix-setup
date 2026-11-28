@@ -14,7 +14,7 @@ Scope {
             exclusionMode: ExclusionMode.Ignore
             mask: Region {}
             focusable: false
-            color: "black"
+            color: Style.backgroundColor
 
             anchors {
                 top: true
@@ -25,7 +25,7 @@ Scope {
 
             Image {
                 anchors.fill: parent
-                source: "file://" + Quickshell.env("HOME") + "/.local/share/img/wallpaper.png"
+                source: Style.wallpaper
                 fillMode: Image.PreserveAspectCrop
                 asynchronous: true
             }
@@ -43,7 +43,7 @@ Scope {
             right: true
         }
 
-        color: "transparent"
+        color: Style.transparentColor
         exclusionMode: ExclusionMode.Ignore
         mask: Region {}
         focusable: false

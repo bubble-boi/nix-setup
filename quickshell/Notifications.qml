@@ -82,7 +82,7 @@ Scope {
         implicitWidth: 456
         implicitHeight: contents.implicitHeight + 28
 
-        color: "transparent"
+        color: Style.transparentColor
         exclusionMode: ExclusionMode.Ignore
         focusable: false
 
@@ -103,7 +103,7 @@ Scope {
                     origin.y: background.height / 2
                     yScale: -1
                 }
-                source: "file://" + Quickshell.env("HOME") + "/.local/share/img/item_bg.png"
+                source: Style.panelBackground
             }
 
             Column {
@@ -119,10 +119,10 @@ Scope {
                 Text {
                     width: parent.width
                     text: root.summaryText
-                    color: "#000000"
+                    color: Style.darkTextColor
                     font.family: Style.monoFontFamily
                     font.bold: true
-                    font.pixelSize: 15
+                    font.pixelSize: Style.inputFontSize
                     textFormat: Text.PlainText
                     wrapMode: Text.Wrap
                     maximumLineCount: 2
@@ -133,9 +133,9 @@ Scope {
                     width: parent.width
                     text: root.bodyText
                     visible: text.length > 0
-                    color: "#000000"
+                    color: Style.darkTextColor
                     font.family: Style.monoFontFamily
-                    font.pixelSize: 13
+                    font.pixelSize: Style.bodyFontSize
                     textFormat: Text.PlainText
                     wrapMode: Text.Wrap
                     maximumLineCount: 3
@@ -155,7 +155,7 @@ Scope {
             property: "y"
             from: notificationWindow.implicitHeight
             to: 0
-            duration: 280
+            duration: Style.panelAnimationDuration
             easing.type: Easing.OutCubic
         }
 
@@ -164,7 +164,7 @@ Scope {
             target: slideTranslation
             property: "y"
             to: notificationWindow.implicitHeight
-            duration: 280
+            duration: Style.panelAnimationDuration
             easing.type: Easing.InCubic
 
             onFinished: {

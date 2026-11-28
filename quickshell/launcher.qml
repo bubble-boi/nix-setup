@@ -103,7 +103,7 @@ ShellRoot {
             left: true
             right: true
         }
-        color: "transparent"
+        color: Style.transparentColor
         exclusionMode: ExclusionMode.Ignore
         focusable: true
 
@@ -135,7 +135,7 @@ ShellRoot {
                 Behavior on displayPosition {
                     enabled: root.query.trim().length === 0
                     NumberAnimation {
-                        duration: 180
+                        duration: Style.fastAnimationDuration
                         easing.type: Easing.OutCubic
                     }
                 }
@@ -210,7 +210,7 @@ ShellRoot {
                 height: 25 * surface.unit
                 color: Style.textColor
                 font.family: Style.monoFontFamily
-                font.pixelSize: 13 * surface.unit
+                font.pixelSize: Style.bodyFontSize * surface.unit
                 horizontalAlignment: TextInput.AlignLeft
                 verticalAlignment: TextInput.AlignVCenter
                 opacity: text.length > 0 ? 1 : 0
@@ -254,14 +254,14 @@ ShellRoot {
                 target: surface
                 property: "scale"
                 to: 1
-                duration: 280
+                duration: Style.panelAnimationDuration
                 easing.type: Easing.OutCubic
             }
             NumberAnimation {
                 target: surface
                 property: "opacity"
                 to: 1
-                duration: 280
+                duration: Style.panelAnimationDuration
                 easing.type: Easing.OutCubic
             }
         }
@@ -272,14 +272,14 @@ ShellRoot {
                 target: surface
                 property: "scale"
                 to: 0.82
-                duration: 280
+                duration: Style.panelAnimationDuration
                 easing.type: Easing.InCubic
             }
             NumberAnimation {
                 target: surface
                 property: "opacity"
                 to: 0
-                duration: 280
+                duration: Style.panelAnimationDuration
                 easing.type: Easing.InCubic
             }
             onFinished: Qt.quit()

@@ -8,7 +8,6 @@ import Quickshell.Services.UPower
 
 Scope {
     id: root
-    readonly property url itemBackground: "file://" + Quickshell.env("HOME") + "/.local/share/img/item_bg.png"
     readonly property var player: Mpris.players.values.find(p => p.isPlaying) || null
     readonly property string track: player ? [player.trackTitle, player.trackArtist].filter(v => v).join("  —  ") : "Hi, " + (Quickshell.env("USER") || Quickshell.env("LOGNAME") || Quickshell.env("HOME").split("/").pop())
     SystemClock {
@@ -28,7 +27,6 @@ Scope {
                 workspaceId: ws.id,
                 current: ws.active
             }))
-            readonly property int workspaceAnimationDuration: 180
 
             ListModel {
                 id: workspaceModel
@@ -85,7 +83,7 @@ Scope {
             anchors { top: true; left: true; right: true }
             implicitHeight: 22
             exclusiveZone: 22
-            color: "transparent"
+            color: Style.transparentColor
             focusable: false
             mask: Region {}
 
@@ -96,16 +94,16 @@ Scope {
                 width: dateText.implicitWidth + 40
                 flushLeft: true
                 height: parent.height
-                source: root.itemBackground
+                source: Style.panelBackground
                 Text {
                     id: dateText
                     anchors.centerIn: parent
                     anchors.horizontalCenterOffset: -7
                     text: Qt.formatDateTime(clock.date, "ddd, MMM d hh:mm")
                     font.family: Style.fontFamily
-                    font.pixelSize: 11
+                    font.pixelSize: Style.barFontSize
                     font.bold: true
-                    color: "#000000"
+                    color: Style.darkTextColor
                 }
             }
             Row {
@@ -136,20 +134,20 @@ Scope {
 
                         Behavior on presence {
                             NumberAnimation {
-                                duration: panel.workspaceAnimationDuration
+                                duration: Style.fastAnimationDuration
                                 easing.type: Easing.OutCubic
                             }
                         }
 
                         Behavior on numberWidth {
                             NumberAnimation {
-                                duration: panel.workspaceAnimationDuration
+                                duration: Style.fastAnimationDuration
                                 easing.type: Easing.OutCubic
                             }
                         }
 
                         Timer {
-                            interval: panel.workspaceAnimationDuration + 20
+                            interval: Style.fastAnimationDuration + 20
                             running: !tile.present
                             onTriggered: panel.removeWorkspace(tile.workspaceId)
                         }
@@ -168,16 +166,16 @@ Scope {
                             Text {
                                 anchors.centerIn: parent
                                 text: String(tile.workspaceId)
-                                color: "#000000"
+                                color: Style.darkTextColor
                                 font.family: Style.fontFamily
-                                font.pixelSize: 11
+                                font.pixelSize: Style.barFontSize
                                 font.bold: true
                                 font.italic: true
                                 opacity: tile.current ? 1 : 0.72
 
                                 Behavior on opacity {
                                     NumberAnimation {
-                                        duration: panel.workspaceAnimationDuration
+                                        duration: Style.fastAnimationDuration
                                         easing.type: Easing.OutCubic
                                     }
                                 }
@@ -200,7 +198,7 @@ Scope {
                     : idleRow.implicitWidth
                 width: Math.min(maxWidth, Math.ceil(contentWidth) + 48)
                 height: parent.height
-                source: root.itemBackground
+                source: Style.panelBackground
 
                 Text {
                     id: playingIcon
@@ -208,9 +206,9 @@ Scope {
                     x: 24
                     anchors.verticalCenter: parent.verticalCenter
                     text: "󰝚"
-                    font.family: "ProFont Nerd Font"
-                    font.pixelSize: 13
-                    color: "#000000"
+                    font.family: Style.iconFontFamily
+                    font.pixelSize: Style.iconFontSize
+                    color: Style.darkTextColor
                 }
                 Item {
                     id: viewport
@@ -237,16 +235,16 @@ Scope {
                         Text {
                             anchors.verticalCenter: parent.verticalCenter
                             text: "󰝛"
-                            font.family: "ProFont Nerd Font"
-                            font.pixelSize: 13
-                            color: "#000000"
+                            font.family: Style.iconFontFamily
+                            font.pixelSize: Style.iconFontSize
+                            color: Style.darkTextColor
                         }
                         Text {
                             anchors.verticalCenter: parent.verticalCenter
                             text: root.track
-                            color: "#000000"
+                            color: Style.darkTextColor
                             font.family: Style.fontFamily
-                            font.pixelSize: 11
+                            font.pixelSize: Style.barFontSize
                             font.bold: true
                             textFormat: Text.PlainText
                         }
@@ -258,9 +256,9 @@ Scope {
                         anchors.left: parent.left
                         anchors.verticalCenter: parent.verticalCenter
                         text: root.track
-                        color: "#000000"
+                        color: Style.darkTextColor
                         font.family: Style.fontFamily
-                        font.pixelSize: 11
+                        font.pixelSize: Style.barFontSize
                         font.bold: true
                         textFormat: Text.PlainText
                     }
@@ -288,19 +286,19 @@ Scope {
                             ctx.clearRect(0, 0, width, height)
                             if (!viewport.scrolling || width <= 0)
                                 return
-                            ctx.font = "bold 11px '" + Style.fontFamily + "'"
+                            ctx.font = "bold " + Style.barFontSize + "px '" + Style.fontFamily + "'"
                             ctx.textBaseline = "middle"
-                            ctx.fillStyle = "#000000"
+                            ctx.fillStyle = Style.darkTextColor
                             const period = Math.max(1, ctx.measureText(root.track).width + 36)
                             const offset = viewport.offset % period
                             for (let x = -offset; x < width; x += period)
                                 ctx.fillText(root.track, x, height / 2)
                             const fade = Math.min(18, width / 2)
                             const gradient = ctx.createLinearGradient(0, 0, width, 0)
-                            gradient.addColorStop(0, "transparent")
-                            gradient.addColorStop(fade / width, "white")
-                            gradient.addColorStop(1 - fade / width, "white")
-                            gradient.addColorStop(1, "transparent")
+                            gradient.addColorStop(0, Style.transparentColor)
+                            gradient.addColorStop(fade / width, Style.maskOpaqueColor)
+                            gradient.addColorStop(1 - fade / width, Style.maskOpaqueColor)
+                            gradient.addColorStop(1, Style.transparentColor)
                             ctx.globalCompositeOperation = "destination-in"
                             ctx.fillStyle = gradient
                             ctx.fillRect(0, 0, width, height)
@@ -322,7 +320,7 @@ Scope {
                 width: batteryText.implicitWidth + 40
                 flushRight: true
                 height: parent.height
-                source: root.itemBackground
+                source: Style.panelBackground
                 Text {
                     id: batteryText
                     anchors.centerIn: parent
@@ -330,9 +328,9 @@ Scope {
                     text: UPower.displayDevice && UPower.displayDevice.ready
                         ? Math.round(UPower.displayDevice.percentage * 100) + "%"
                         : "—%"
-                    color: "#000000"
+                    color: Style.darkTextColor
                     font.family: Style.fontFamily
-                    font.pixelSize: 11
+                    font.pixelSize: Style.barFontSize
                     font.bold: true
                 }
             }
