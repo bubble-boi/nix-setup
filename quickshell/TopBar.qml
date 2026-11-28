@@ -338,7 +338,7 @@ Scope {
                         parallelSides: true
                         reverseSlope: true
                         sideInset: audioRow.slope
-                        width: batteryItem.width
+                        width: batteryItem.width + audioRow.slope / 2
                         height: audioRow.height
                         source: Style.panelBackground
                         backgroundOffsetX: x
