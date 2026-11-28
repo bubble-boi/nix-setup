@@ -64,12 +64,14 @@ Scope {
                     model: panel.workspaces
 
                     delegate: BarItem {
+                        id: workspaceItem
                         required property var modelData
                         parallelSides: true
                         sideInset: dateItem.sideInset
-                        width: sideInset + Math.max(22, numberText.implicitWidth + 12)
+                        width: sideInset + (modelData.active ? 60 : 30)
                         height: workspaceRow.height
-                        source: root.itemBackground
+                        source: dateItem.source
+                        backgroundOffsetX: workspaceRow.x + workspaceItem.x - dateItem.x
 
                         Text {
                             id: numberText

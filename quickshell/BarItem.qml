@@ -7,8 +7,12 @@ Item {
     property bool flushLeft: false
     property bool flushRight: false
     property url source
+    property real backgroundOffsetX: 0
+
+    onBackgroundOffsetXChanged: canvas.requestPaint()
 
     Canvas {
+        id: canvas
         anchors.fill: parent
         onWidthChanged: requestPaint()
         onHeightChanged: requestPaint()
@@ -37,7 +41,7 @@ Item {
             ctx.fillStyle = "#181818"
             ctx.fillRect(0, 0, w, h)
             if (isImageLoaded(root.source))
-                ctx.drawImage(root.source, 0, 0)
+                ctx.drawImage(root.source, -root.backgroundOffsetX, 0)
             // Follow the exposed edges only.
             ctx.beginPath()
             if (!root.flushRight) {
