@@ -127,7 +127,7 @@ Scope {
 
                         property bool initialized: false
                         property real presence: initialized && present ? 1 : 0
-                        property real numberWidth: current ? 60 : 30
+                        property real numberWidth: current ? 100 : 50
 
                         width: (numberWidth + workspaceRow.chipGap) * presence
                         height: workspaceRow.height
