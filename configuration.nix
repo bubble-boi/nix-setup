@@ -103,6 +103,7 @@
     mplus-outline-fonts.githubRelease
     courier-prime
     (google-fonts.override { fonts = [ "BIZ UDPMincho" ]; })
+    (google-fonts.override { fonts = [ "Lugrasimo" ]; })
   ];
 
   environment.systemPackages = with pkgs; [

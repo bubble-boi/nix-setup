@@ -125,7 +125,7 @@ Scope {
                     width: parent.width
                     text: root.summaryText
                     color: Style.darkTextColor
-                    font.family: Style.fontFamily
+                    font.family: "Lugrasimo"
                     font.bold: true
                     font.pixelSize: 18
                     horizontalAlignment: Text.AlignHCenter
@@ -140,7 +140,7 @@ Scope {
                     text: root.bodyText
                     visible: text.length > 0
                     color: Style.darkTextColor
-                    font.family: Style.fontFamily
+                    font.family: "Lugrasimo"
                     font.pixelSize: 14
                     horizontalAlignment: Text.AlignHCenter
                     textFormat: Text.PlainText
