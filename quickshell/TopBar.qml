@@ -127,7 +127,7 @@ Scope {
 
                         property bool initialized: false
                         property real presence: initialized && present ? 1 : 0
-                        property real numberWidth: current ? 100 : 50
+                        property real numberWidth: current ? 80 : 50
 
                         width: (numberWidth + workspaceRow.chipGap) * presence
                         height: workspaceRow.height
@@ -172,6 +172,7 @@ Scope {
                                 font.family: Style.fontFamily
                                 font.pixelSize: 11
                                 font.bold: true
+                                font.italic: true
                                 opacity: tile.current ? 1 : 0.72
 
                                 Behavior on opacity {
