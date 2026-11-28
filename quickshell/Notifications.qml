@@ -108,7 +108,7 @@ Scope {
                 id: background
                 anchors.fill: parent
                 sideInset: 0
-                source: Style.panelBackground
+                source: "file://" + Quickshell.env("HOME") + "/.local/share/img/notify_bg.png"
             }
 
             Column {
