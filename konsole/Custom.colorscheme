@@ -1,0 +1,4 @@
+[General]
+Description=Custom
+Opacity=1
+Wallpaper[$e]=$HOME/.local/share/img/term_bg.png

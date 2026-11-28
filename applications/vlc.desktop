@@ -1,0 +1,5 @@
+[Desktop Entry]
+Type=Application
+Name=VLC
+Exec=vlc
+Icon=/home/qwe/.local/share/img/icons/vlc.png

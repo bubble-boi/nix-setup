@@ -1,0 +1,5 @@
+[Desktop Entry]
+Type=Application
+Name=Chrome
+Exec=google-chrome-stable
+Icon=/home/qwe/.local/share/img/icons/chrome.png

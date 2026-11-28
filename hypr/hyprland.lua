@@ -1,0 +1,19 @@
+-- DISPLAY
+require("hyprland.monitors-default")
+
+-- LOOK AND FEEL
+require("hyprland.LnF-default")
+
+-- INPUT
+require("hyprland.input-default")
+
+-- KEYBINDINGS
+require("hyprland.keybinding-default")
+
+-- AUTOSTART
+hl.on("hyprland.start", function()
+    hl.exec_cmd("qs -n")
+    hl.exec_cmd("fcitx5 -rd")
+    hl.exec_cmd("clip 1")
+    hl.exec_cmd("clip 2")
+end)
