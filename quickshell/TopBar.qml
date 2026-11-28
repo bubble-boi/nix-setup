@@ -1,4 +1,5 @@
 import QtQuick
+import QtQml.Models
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Hyprland
@@ -23,6 +24,61 @@ Scope {
             readonly property var workspaces: Hyprland.workspaces.values
                 .filter(ws => ws.id > 0 && monitor !== null && ws.monitor === monitor)
                 .sort((a, b) => a.id - b.id)
+            readonly property var workspaceStates: workspaces.map(ws => ({
+                workspaceId: ws.id,
+                current: ws.active
+            }))
+            readonly property int workspaceAnimationDuration: 180
+
+            ListModel {
+                id: workspaceModel
+            }
+
+            function syncWorkspaces() {
+                if (!workspaceModel)
+                    return
+
+                const states = workspaceStates
+                for (let i = 0; i < workspaceModel.count; ++i) {
+                    const id = workspaceModel.get(i).workspaceId
+                    const state = states.find(ws => ws.workspaceId === id)
+                    if (state) {
+                        workspaceModel.setProperty(i, "current", state.current)
+                        workspaceModel.setProperty(i, "present", true)
+                    } else {
+                        workspaceModel.setProperty(i, "present", false)
+                    }
+                }
+
+                for (const state of states) {
+                    let i = 0
+                    while (i < workspaceModel.count &&
+                           workspaceModel.get(i).workspaceId < state.workspaceId)
+                        ++i
+                    if (i === workspaceModel.count ||
+                        workspaceModel.get(i).workspaceId !== state.workspaceId) {
+                        workspaceModel.insert(i, {
+                            workspaceId: state.workspaceId,
+                            current: state.current,
+                            present: true
+                        })
+                    }
+                }
+            }
+
+            function removeWorkspace(id) {
+                for (let i = 0; i < workspaceModel.count; ++i) {
+                    const entry = workspaceModel.get(i)
+                    if (entry.workspaceId === id && !entry.present) {
+                        workspaceModel.remove(i)
+                        return
+                    }
+                }
+            }
+
+            onWorkspaceStatesChanged: syncWorkspaces()
+            Component.onCompleted: syncWorkspaces()
+
             screen: modelData
             WlrLayershell.namespace: "quickshell:topbar"
             WlrLayershell.layer: WlrLayer.Top
@@ -54,34 +110,77 @@ Scope {
             }
             Row {
                 id: workspaceRow
+                readonly property real chipGap: 3
                 anchors.left: dateItem.right
-                anchors.leftMargin: 3 - dateItem.sideInset
+                anchors.leftMargin: chipGap - dateItem.sideInset
                 anchors.top: parent.top
                 height: parent.height
-                spacing: 3 - dateItem.sideInset
 
                 Repeater {
-                    model: panel.workspaces
+                    model: workspaceModel
 
-                    delegate: BarItem {
-                        id: workspaceItem
-                        required property var modelData
-                        parallelSides: true
-                        sideInset: dateItem.sideInset
-                        width: sideInset + (modelData.active ? 60 : 30)
+                    delegate: Item {
+                        id: tile
+                        required property int workspaceId
+                        required property bool current
+                        required property bool present
+
+                        property bool initialized: false
+                        property real presence: initialized && present ? 1 : 0
+                        property real numberWidth: current ? 60 : 30
+
+                        width: (numberWidth + workspaceRow.chipGap) * presence
                         height: workspaceRow.height
-                        source: dateItem.source
-                        backgroundOffsetX: workspaceRow.x + workspaceItem.x - dateItem.x
 
-                        Text {
-                            id: numberText
-                            anchors.centerIn: parent
-                            text: String(modelData.id)
-                            color: "#000000"
-                            font.family: Style.fontFamily
-                            font.pixelSize: 11
-                            font.bold: true
-                            opacity: modelData.active ? 1 : 0.72
+                        Component.onCompleted: initialized = true
+
+                        Behavior on presence {
+                            NumberAnimation {
+                                duration: panel.workspaceAnimationDuration
+                                easing.type: Easing.OutCubic
+                            }
+                        }
+
+                        Behavior on numberWidth {
+                            NumberAnimation {
+                                duration: panel.workspaceAnimationDuration
+                                easing.type: Easing.OutCubic
+                            }
+                        }
+
+                        Timer {
+                            interval: panel.workspaceAnimationDuration + 20
+                            running: !tile.present
+                            onTriggered: panel.removeWorkspace(tile.workspaceId)
+                        }
+
+                        BarItem {
+                            id: workspaceItem
+                            parallelSides: true
+                            sideInset: dateItem.sideInset
+                            width: sideInset + tile.numberWidth * tile.presence
+                            height: tile.height
+                            opacity: tile.presence
+                            visible: opacity > 0
+                            source: dateItem.source
+                            backgroundOffsetX: workspaceRow.x + tile.x - dateItem.x
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: String(tile.workspaceId)
+                                color: "#000000"
+                                font.family: Style.fontFamily
+                                font.pixelSize: 11
+                                font.bold: true
+                                opacity: tile.current ? 1 : 0.72
+
+                                Behavior on opacity {
+                                    NumberAnimation {
+                                        duration: panel.workspaceAnimationDuration
+                                        easing.type: Easing.OutCubic
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -90,7 +189,7 @@ Scope {
             BarItem {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: parent.top
-                readonly property real leftEnd: Math.max(dateItem.width, workspaceRow.x + workspaceRow.width)
+                readonly property real leftEnd: dateItem.width + workspaceRow.width
                 readonly property real maxWidth: Math.max(0, Math.min(
                     300, parent.width * 0.42, parent.width - 2 * (leftEnd + 4),
                     2 * batteryItem.x - parent.width - 8))
