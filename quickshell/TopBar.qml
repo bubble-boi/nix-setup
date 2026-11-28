@@ -5,11 +5,16 @@ import Quickshell.Wayland
 import Quickshell.Hyprland
 import Quickshell.Services.Mpris
 import Quickshell.Services.UPower
+import Quickshell.Services.Pipewire
 
 Scope {
     id: root
     readonly property var player: Mpris.players.values.find(p => p.isPlaying) || null
     readonly property string track: player ? [player.trackTitle, player.trackArtist].filter(v => v).join("  —  ") : "Hi, " + (Quickshell.env("USER") || Quickshell.env("LOGNAME") || Quickshell.env("HOME").split("/").pop())
+    PwObjectTracker {
+        objects: [Pipewire.defaultAudioSink, Pipewire.defaultAudioSource].filter(node => node != null)
+    }
+
     SystemClock {
         id: clock
         precision: SystemClock.Minutes
@@ -19,6 +24,7 @@ Scope {
         PanelWindow {
             id: panel
             required property var modelData
+            readonly property real chipGap: 3
             readonly property var monitor: Hyprland.monitorFor(screen)
             readonly property var workspaces: Hyprland.workspaces.values
                 .filter(ws => ws.id > 0 && monitor !== null && ws.monitor === monitor)
@@ -108,7 +114,7 @@ Scope {
             }
             Row {
                 id: workspaceRow
-                readonly property real chipGap: 3
+                readonly property real chipGap: panel.chipGap
                 anchors.left: dateItem.right
                 anchors.leftMargin: chipGap - dateItem.sideInset
                 anchors.top: parent.top
@@ -191,7 +197,7 @@ Scope {
                 readonly property real leftEnd: dateItem.width + workspaceRow.width
                 readonly property real maxWidth: Math.max(0, Math.min(
                     300, parent.width * 0.42, parent.width - 2 * (leftEnd + 4),
-                    2 * batteryItem.x - parent.width - 8))
+                    2 * audioRow.x - parent.width - 8))
                 visible: width >= 60
                 readonly property real contentWidth: root.player
                     ? playingIcon.implicitWidth + 6 + staticTrack.implicitWidth
@@ -312,8 +318,48 @@ Scope {
                     }
                 }
             }
+            Row {
+                id: audioRow
+                readonly property real slope: batteryItem.effectiveSideInset
+                anchors.right: batteryItem.left
+                anchors.rightMargin: panel.chipGap - slope
+                anchors.top: parent.top
+                height: parent.height
+                spacing: panel.chipGap - slope
+
+                Repeater {
+                    model: 2
+
+                    delegate: BarItem {
+                        id: audioItem
+                        required property int index
+                        readonly property var node: index === 1 ? Pipewire.defaultAudioSource : Pipewire.defaultAudioSink
+                        readonly property var audio: node ? node.audio : null
+                        parallelSides: true
+                        reverseSlope: true
+                        sideInset: audioRow.slope
+                        width: batteryItem.width
+                        height: audioRow.height
+                        source: Style.panelBackground
+                        backgroundOffsetX: x
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: audioItem.audio
+                                ? Math.round(audioItem.audio.volume * 100) + "%"
+                                : "—%"
+                            font.family: Style.fontFamily
+                            font.pixelSize: Style.barFontSize
+                            font.bold: true
+                            color: Style.darkTextColor
+                        }
+                    }
+                }
+            }
+
             BarItem {
                 id: batteryItem
+                backgroundOffsetX: x - audioRow.x
                 anchors.right: parent.right
                 anchors.top: parent.top
                 width: batteryText.implicitWidth + 40
