@@ -3,6 +3,7 @@ import QtQuick
 Item {
     id: root
     property real sideInset: 20
+    property bool parallelSides: false
     property bool flushLeft: false
     property bool flushRight: false
     property url source
@@ -18,15 +19,16 @@ Item {
             const ctx = getContext("2d")
             const w = width, h = height
             if (w <= 0 || h <= 0) return
-            const inset = Math.min(Math.max(0, root.sideInset), w / 4)
-            const left = root.flushLeft ? 0 : inset
+            const inset = Math.min(Math.max(0, root.sideInset), w / (root.parallelSides ? 2 : 4))
+            const topLeft = !root.flushLeft && root.parallelSides ? inset : 0
+            const left = root.flushLeft || root.parallelSides ? 0 : inset
             const right = root.flushRight ? w : w - inset
 
             ctx.reset()
             ctx.clearRect(0, 0, w, h)
             ctx.save()
             ctx.beginPath()
-            ctx.moveTo(0, 0)
+            ctx.moveTo(topLeft, 0)
             ctx.lineTo(w, 0)
             ctx.lineTo(right, h)
             ctx.lineTo(left, h)
@@ -46,7 +48,7 @@ Item {
             }
             ctx.lineTo(left, h)
             if (!root.flushLeft)
-                ctx.lineTo(0, 0)
+                ctx.lineTo(topLeft, 0)
 
             ctx.strokeStyle = "#000000"
             ctx.lineJoin = "miter"

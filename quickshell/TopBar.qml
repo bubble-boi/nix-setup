@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
+import Quickshell.Hyprland
 import Quickshell.Services.Mpris
 import Quickshell.Services.UPower
 
@@ -16,7 +17,12 @@ Scope {
     Variants {
         model: Quickshell.screens
         PanelWindow {
+            id: panel
             required property var modelData
+            readonly property var monitor: Hyprland.monitorFor(screen)
+            readonly property var workspaces: Hyprland.workspaces.values
+                .filter(ws => ws.id > 0 && monitor !== null && ws.monitor === monitor)
+                .sort((a, b) => a.id - b.id)
             screen: modelData
             WlrLayershell.namespace: "quickshell:topbar"
             WlrLayershell.layer: WlrLayer.Top
@@ -28,6 +34,7 @@ Scope {
             mask: Region {}
 
             BarItem {
+                id: dateItem
                 anchors.left: parent.left
                 anchors.top: parent.top
                 width: dateText.implicitWidth + 40
@@ -45,10 +52,47 @@ Scope {
                     color: "#000000"
                 }
             }
+            Row {
+                id: workspaceRow
+                anchors.left: dateItem.right
+                anchors.leftMargin: 3 - dateItem.sideInset
+                anchors.top: parent.top
+                height: parent.height
+                spacing: 3 - dateItem.sideInset
+
+                Repeater {
+                    model: panel.workspaces
+
+                    delegate: BarItem {
+                        required property var modelData
+                        parallelSides: true
+                        sideInset: dateItem.sideInset
+                        width: sideInset + Math.max(22, numberText.implicitWidth + 12)
+                        height: workspaceRow.height
+                        source: root.itemBackground
+
+                        Text {
+                            id: numberText
+                            anchors.centerIn: parent
+                            text: String(modelData.id)
+                            color: "#000000"
+                            font.family: Style.fontFamily
+                            font.pixelSize: 11
+                            font.bold: true
+                            opacity: modelData.active ? 1 : 0.72
+                        }
+                    }
+                }
+            }
+
             BarItem {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: parent.top
-                readonly property real maxWidth: Math.min(300, parent.width * 0.42)
+                readonly property real leftEnd: Math.max(dateItem.width, workspaceRow.x + workspaceRow.width)
+                readonly property real maxWidth: Math.max(0, Math.min(
+                    300, parent.width * 0.42, parent.width - 2 * (leftEnd + 4),
+                    2 * batteryItem.x - parent.width - 8))
+                visible: width >= 60
                 readonly property real contentWidth: root.player
                     ? playingIcon.implicitWidth + 6 + staticTrack.implicitWidth
                     : idleRow.implicitWidth
@@ -170,6 +214,7 @@ Scope {
                 }
             }
             BarItem {
+                id: batteryItem
                 anchors.right: parent.right
                 anchors.top: parent.top
                 width: batteryText.implicitWidth + 40
