@@ -165,7 +165,7 @@ Scope {
 
                             Text {
                                 anchors.centerIn: parent
-                                text: String(tile.workspaceId)
+                                text: ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"][tile.workspaceId - 1] ?? String(tile.workspaceId)
                                 color: Style.darkTextColor
                                 font.family: Style.fontFamily
                                 font.pixelSize: Style.barFontSize
@@ -234,7 +234,6 @@ Scope {
 
                         Text {
                             anchors.verticalCenter: parent.verticalCenter
-                            text: "󰝛"
                             font.family: Style.iconFontFamily
                             font.pixelSize: Style.iconFontSize
                             color: Style.darkTextColor
