@@ -26,7 +26,9 @@ Scope {
         hideAnimation.from = slideTranslation.y
         hideAnimation.start()
     }
-    readonly property int sideInset: 30
+    readonly property int panelSize: 240
+    readonly property int screenMargin: 12
+    readonly property int contentPadding: 14
 
     NotificationServer {
         id: server
@@ -77,10 +79,17 @@ Scope {
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
-        anchors.bottom: true
+        anchors {
+            bottom: true
+            right: true
+        }
+        margins {
+            bottom: root.screenMargin
+            right: root.screenMargin
+        }
 
-        implicitWidth: 456
-        implicitHeight: contents.implicitHeight + 28
+        implicitWidth: root.panelSize
+        implicitHeight: root.panelSize
 
         color: Style.transparentColor
         exclusionMode: ExclusionMode.Ignore
@@ -98,11 +107,7 @@ Scope {
             BarItem {
                 id: background
                 anchors.fill: parent
-                sideInset: root.sideInset
-                transform: Scale {
-                    origin.y: background.height / 2
-                    yScale: -1
-                }
+                sideInset: 0
                 source: Style.panelBackground
             }
 
@@ -110,10 +115,12 @@ Scope {
                 id: contents
                 anchors {
                     top: parent.top
-                    topMargin: 14
-                    horizontalCenter: parent.horizontalCenter
+                    topMargin: root.contentPadding
+                    left: parent.left
+                    leftMargin: root.contentPadding
+                    right: parent.right
+                    rightMargin: root.contentPadding
                 }
-                width: 420 - 28
                 spacing: 6
 
                 Text {
@@ -138,7 +145,7 @@ Scope {
                     font.pixelSize: Style.bodyFontSize
                     textFormat: Text.PlainText
                     wrapMode: Text.Wrap
-                    maximumLineCount: 3
+                    maximumLineCount: 8
                     elide: Text.ElideRight
                 }
             }
